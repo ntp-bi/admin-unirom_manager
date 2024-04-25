@@ -1,0 +1,145 @@
+.addTeacher {
+    width: 100%;
+    display: flex;
+
+    .addContainer {
+        flex: 6;
+
+        .top,
+        .bottom {
+            -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+            box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px;
+            display: flex;
+
+            span {
+                color: #210876;
+                font-size: 24px;
+                font-weight: 600;
+            }
+
+            .left {
+                flex: 1;
+                text-align: center;
+
+                .image {
+                    width: 250px;
+                    height: 250px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    // border: 1px solid gray;
+                }
+            }
+
+            .right {
+                flex: 2;
+
+                form {
+                    display: flex;
+                    flex-wrap: wrap;                
+                    gap: 30px;
+                    justify-content: space-around;
+                    position: relative;
+
+                    .formInput {
+                        width: 40%;
+
+                        label {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            color: #210876;
+                            font-weight: 600;
+
+                            .icon {
+                                cursor: pointer;
+                            }
+                        }
+
+                        input {
+                            width: 100%;
+                            padding: 5px;
+                            border: none;
+                            border-bottom: 1px solid gray;
+                            font-size: 18px;
+                            outline: none;
+                            background-color: transparent;
+
+                            &::placeholder {
+                                font-size: 15px;
+                                color: gray;
+                            }
+                        }       
+                        
+                    }                
+                    .radio {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;                    
+
+                        label {
+                            margin-right: 20px;
+                        }
+
+                        input {
+                            width: 18px;
+                            height: 18px;
+                            margin-right: 10px;
+                        }
+
+                        .input-radio + .input-radio{
+                            margin-left: 20px;
+                        }
+                    }
+
+                    .email {
+                        width: 92%;
+                    }
+
+                    .btn-action {
+                        display: flex;
+                        align-items: center;
+                        position: absolute;
+                        right: 22px;
+                        bottom: -76px;
+
+                        .back {
+                            color: goldenrod;
+                            border: 1px dotted goldenrod;
+                            margin-right: 10px;
+                            transition: background-color 0.3s linear;
+
+                            &:hover {
+                                background-color: #e0e5ae;
+                            }
+                        }
+                    }
+
+                    button {
+                        color: #31b0d5;
+                        font-size: 16px;
+                        font-weight: 600;
+                        border: 1px dotted #31b0d5;
+                        padding: 5px;
+                        width: 100px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        margin-left: 33px;
+                        transition: background-color 0.3s linear;
+
+                        &:hover {
+                            background-color: #d2edf9;
+                        }
+                    }
+                }
+            }
+        }
+
+        .bottom {
+            padding: 20px 0;
+            min-height: 300px;
+        }
+    }
+}

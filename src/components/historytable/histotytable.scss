@@ -1,0 +1,80 @@
+.historytable {
+    color: #616161;
+
+    .tableCell {
+        background-color: whitesmoke;
+        color: #616161;
+        font-size: 15px;
+
+        .cellWrapper {
+            display: flex;
+            align-items: center;
+
+            .image {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border: 1px dotted #31b0d5;
+                border-radius: 4px;
+                margin-right: 10px;
+            }
+        }
+
+        span {
+            background-color: #210876;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .status {
+            padding: 5px;
+            border-radius: 5px;        
+
+            &.completed {
+                color: green;
+                background-color: rgba(0, 128, 0, 0.15);
+            }
+            &.pending {
+                color: goldenrod;
+                background-color: rgba(173, 188, 1, 0.29);
+            }
+        }        
+
+        .btn + .btn {
+            margin-left: 10px;            
+        }            
+
+        .detailBtn {
+            padding: 4px 8px;
+            border-radius: 5px;
+            color: goldenrod;
+            border: 1px dotted goldenrod;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background-color 0.3s linear;
+
+            &:hover {
+                background-color: #E0E5AE;
+            }
+        }
+    }
+
+    .tabble-header {
+        font-weight: 600;
+        color: #210876;
+        font-size: 16px;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        text-align: end !important;
+    }
+}

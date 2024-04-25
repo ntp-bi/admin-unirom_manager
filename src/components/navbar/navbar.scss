@@ -1,0 +1,144 @@
+.navbar {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    background-color: whitesmoke;
+    border-bottom: 1px solid lightgray;
+    width: 1248px;
+
+    .navbar.shrink {
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        z-index: 100;
+    }
+
+    .navbarContainer {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+
+        .menu__icon {
+            color: #210876;
+            cursor: pointer;
+        }
+
+        .items {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            position: absolute;
+            right: 10px;
+
+            .item {
+                position: relative;
+                display: flex;
+                align-items: center;
+                margin-right: 20px;
+
+                .icon {
+                    font-size: 25px;
+                    cursor: pointer;
+                }
+
+                .counter {
+                    position: absolute;
+                    width: 15px;
+                    height: 15px;
+                    background-color: red;
+                    border-radius: 50%;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    font-weight: bold;
+                    top: -5px;
+                    right: -5px;
+                }
+            }
+
+            .account-item {
+                position: relative;
+
+                .sub-item {
+                    position: absolute;
+                    list-style: none;
+                    background-color: #fff;
+                    width: 160px;
+                    top: calc(100% + 10px);
+                    right: -10px;
+                    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                    padding: 8px 0;
+                    border-radius: 4px;
+                    transition: all 0.3s ease-in;
+
+                    li {
+                        padding: 4px 10px;
+                        font-size: 15px;
+                        color: #616161;
+
+                        &:hover {
+                            background-color: rgba(201, 201, 201, 0.2);
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                .sub-item::before {
+                    content: "";
+                    position: absolute;
+                    right: 4px;
+                    top: -29px;
+                    border-width: 20px 21px;
+                    border-color: transparent transparent #fff transparent;
+                    border-style: solid;
+                }
+
+                .profileImg {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #210876;
+                    cursor: pointer;
+                    padding: 1px;
+                }
+            }
+        }
+        .btn-register,
+        .btn-login {
+            color: #fff;
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 50px;
+        }
+
+        .btn-register {
+            background-color: #82ca9d;
+        }
+
+        .btn-login {
+            background-color: #31B0D5;
+        }
+
+        .btn-avatar {
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            position: relative;
+            top: -2px;
+        }
+    }
+}
+
+// .MuiSvgIcon-root {
+//     color: #31B0D5 !important;
+// }
+
+// .MuiSwitch-switchBase {
+//     color: #31B0D5 !important;
+// }

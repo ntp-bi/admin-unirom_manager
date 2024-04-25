@@ -1,0 +1,196 @@
+.teacher {
+    display: flex;
+    width: 100%;
+    background-color: whitesmoke;
+    color: #616161;
+
+    .teacherContainer {
+        flex: 6;
+        overflow-x: hidden;
+
+        .teacherList {
+            -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+            box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+            // padding: 20px;
+            margin: 20px;
+
+            .datatableTitle {
+                padding: 20px 20px 0;
+                width: 100%;
+                font-size: 24px;
+                color: #210876;
+                // margin-bottom: 10px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .teacherSearch {
+                display: flex;
+                align-items: center;
+                margin: 30px 20px 20px;
+
+                h4 {
+                    color: #210876;
+                }
+
+                .search {
+                    display: flex;
+                    align-items: center;
+                    width: 83%;
+
+                    input {
+                        border: 1px solid #616161;
+                        padding: 2px 10px;
+                        width: 100%;
+                        font-size: 15px;
+                        outline: none;
+                        height: 30px;
+                        margin-left: 20px;
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+
+                        &::placeholder {
+                            font-size: 15px;
+                        }
+                        &:focus {
+                            border: 2px solid #000;
+                            height: 29px;
+                        }
+                    }
+
+                    .MuiSvgIcon-root {
+                        background-color: #31b0d5 !important;
+                        font-size: 20px;
+                        padding: 1px 10px;
+                        height: 34px;
+                        color: #fff !important;
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;
+                        border-bottom-right-radius: 2px;
+                        border-top-right-radius: 2px;
+
+                        &:hover {
+                            background-color: #1a7a8c !important;
+                        }
+
+                        .css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+                            border-color: transparent !important;
+                        }
+                    }                                
+                }
+            }
+            .link {
+                color: green;
+                font-size: 16px;
+                font-weight: 400;
+                border: 1px dotted green;
+                padding: 5px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-left: 38px;
+                transition: background-color 0.3s linear;
+
+                &:hover {
+                    background-color: #D0E3D0;
+                }
+            }
+
+            .pagination {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 0 20px 0;
+            }
+        }
+
+        .top {
+            padding: 20px;
+            gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, auto));
+
+            .left {
+                flex: 1;
+                padding: 20px;
+                -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+                box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                position: relative;
+
+                .btnAction {
+                    position: absolute;
+                    top: 12px;
+                    right: 20px;
+                    padding: 7px 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+
+                    .deleteButton {
+                        color: crimson;
+                    }
+
+                    .editButton {
+                        color: #31b0d5;
+                        margin-left: 10px;
+                    }
+                }
+                .item {
+                    display: flex;
+                    gap: 20px;
+
+                    .itemImg {
+                        width: 120px;
+                        height: 120px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                    }
+
+                    .details {
+                        .itemTitle {
+                            font-size: 21px;
+                            margin-bottom: 10px;
+                            color: #210876;
+                        }
+                        .detailItem {
+                            margin-bottom: 10px;
+                            font-size: 14px;
+
+                            .itemkey {
+                                font-weight: bold;
+                                color: #616161;
+                                margin-right: 5px;
+                                font-size: 15px;
+                            }
+                            .itemValue {
+                                font-size: 15px;
+                            }
+
+                            .itemValue {
+                                font-size: 15px;
+                            }
+                        }
+                    }
+                }
+            }
+            .right {
+                flex: 2;
+            }
+        }
+
+        .title {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: gray;
+        }
+
+        .bottom {
+            margin: 10px 20px;
+            padding: 20px;
+            -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+            box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+        }
+    }
+   
+}

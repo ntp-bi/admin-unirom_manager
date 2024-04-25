@@ -1,0 +1,113 @@
+.sidebar {
+    width: 17rem;
+    max-width: 17rem;
+
+    min-height: 100vh;
+    border-right: 0.5px solid lightgray;
+    background-color: whitesmoke;
+    transition: 0.5s all ease-in;
+
+    &.active {
+        width: 3rem;
+        transition: 0.5s all ease-in;
+
+        .logo {
+            display: none;
+        }
+
+        span {
+            display: none;
+        }
+
+        .title {
+            display: none;
+        }
+    }
+
+    .top {
+        display: flex;
+        height: 50px;
+        align-items: center;
+        justify-content: center;
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #210876;
+            margin-right: 10px;
+        }
+
+        .menu__icon {
+            position: relative;
+            top: 3px;
+            color: #210876;
+            cursor: pointer;
+        }
+    }
+
+    .bottom {
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            .title {
+                font-size: 17px;
+                font-weight: bold;
+                color: #616161;
+                margin-top: 15px;
+                margin-bottom: 5px;
+                margin-left: 10px;
+            }
+
+            li {
+                display: flex;
+                align-items: center;
+                padding: 14px 5px;
+                cursor: pointer;
+                height: 20px;
+                transition: 0.3s ease-in;
+
+                &:hover {
+                    // background-color: rgba($color: #dddd, $alpha: 1);
+                    background-color: #210876;
+                    border-radius: 10px;
+
+                    .icon {
+                        color: #fff;
+                    }
+
+                    span {
+                        color: #fff;
+                    }
+                }
+
+                .icon {
+                    font-size: 26px;
+                    color: #210876;
+                    padding-left: 6px;
+                }
+
+                &.active {
+                    background-color: #210876;
+                    border-radius: 10px;
+                    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+
+                    span {
+                        color: #fff;
+                    }
+
+                    .icon {
+                        color: #fff;
+                    }
+                }
+            }
+            span {
+                font-size: 16px;
+                font-weight: 600;
+                color: #616161;
+                margin-left: 10px;
+            }
+        }
+    }
+}
