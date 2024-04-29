@@ -7,7 +7,82 @@ import "./add-room.scss";
 import { Link } from "react-router-dom";
 
 const AddRoom = () => {
-    const [file, setFile] = useState(null);
+    // const [file, setFile] = useState(null);
+    const [newRoom, setNewRoom] = useState({
+        photo: null,
+        nameRoom: "",
+        roomType: "",
+        area: "",
+        countOfSeat: "",
+        description: "",
+    });
+
+    const [imagePreview, setImagePreview] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const handleRoomInputChange = (e) => {
+        const name = e.target.name;
+        let value = e.target.value;
+        if (name === "area") {
+            if (!isNaN(value)) {
+                value = parseFloat(value);
+            } else {
+                value = "";
+            }
+        }
+        if (name === "countOfSeat") {
+            if (!isNaN(value)) {
+                value = parseInt(value);
+            } else {
+                value = "";
+            }
+        }
+        setNewRoom({ ...newRoom, [name]: value });
+    };
+
+    const handleImageChange = (e) => {
+        const selectedImage = e.target.files[0];
+        setNewRoom({ ...newRoom, photo: selectedImage });
+        setImagePreview(URL.createObjectURL(selectedImage));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const success = await addRoom(
+                newRoom.photo,
+                newRoom.nameRoom,
+                newRoom.roomType,
+                newRoom.area,
+                newRoom.countOfSeat,
+                newRoom.description
+            );
+            if (success !== undefined) {
+                setSuccessMessage("Phòng đã được thêm vào cơ sở dữ liệu");
+                setNewRoom({
+                    photo: null,
+                    nameRoom: "",
+                    roomType: "",
+                    area: "",
+                    countOfSeat: "",
+                    description: "",
+                });
+                setImagePreview("");
+                setErrorMessage("");
+            } else {
+                setErrorMessage("Có lỗi xảy ra khi thêm phòng mới!");
+            }
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
+
+        setTimeout(() => {
+            setSuccessMessage("");
+            setErrorMessage("");
+        }, 3000);
+    };
+
     return (
         <div className="add">
             <Sidebar />
@@ -17,6 +92,11 @@ const AddRoom = () => {
                     <div className="top">
                         <span>Thêm phòng mới</span>
                     </div>
+                    {successMessage && (
+                            <div className="alert alert-success fade show">
+                                {successMessage}
+                            </div>
+                        )}
                     <div className="bottom">
                         <div className="left">
                             <img

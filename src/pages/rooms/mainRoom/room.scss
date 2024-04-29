@@ -35,21 +35,24 @@
                     border: 1px solid #616161;
                     // border: none;
                     padding: 4px 10px;
-                    width: 30%;
+                    width: 20%;
                     margin-right: 10px;
                     font-size: 15px;
                     height: 34px;
                     cursor: pointer;
                     color: #616161;
                     border-radius: 2px;
-                    // background-color: #fff;
-                    // box-shadow: 1px 2px 10px -2px rgba(0, 0, 0, 0.3);
+                }
+
+                .select + .select {
+                    margin-left: 10px;
                 }
 
                 .search {
                     display: flex;
                     align-items: center;
-                    width: 59%;
+                    width: 47%;
+                    position: relative;
 
                     input {
                         border: 1px solid #616161;
@@ -58,7 +61,7 @@
                         font-size: 15px;
                         outline: none;
                         height: 30px;
-                        margin-left: 20px;
+                        margin-left: 10px;
                         border-top-left-radius: 2px;
                         border-bottom-left-radius: 2px;
 
@@ -71,19 +74,57 @@
                         }
                     }
 
-                    .MuiSvgIcon-root {
-                        background-color: #31b0d5 !important;
-                        font-size: 20px;
-                        padding: 1px 10px;
-                        height: 34px;
-                        color: #fff !important;
-                        cursor: pointer;
-                        transition: background-color 0.3s ease;
-                        border-bottom-right-radius: 2px;
-                        border-top-right-radius: 2px;
+                    .search-btn {
+                        position: relative;
+                        top: 2px;
+                        border: none;
 
-                        &:hover {
-                            background-color: #1a7a8c !important;
+                        .MuiSvgIcon-root {
+                            background-color: #31b0d5 !important;
+                            font-size: 20px;
+                            padding: 1px 10px;
+                            height: 34px;
+                            color: #fff !important;
+                            cursor: pointer;
+                            transition: background-color 0.3s ease;
+                            border-bottom-right-radius: 2px;
+                            border-top-right-radius: 2px;
+
+                            &:hover {
+                                background-color: #1a7a8c !important;
+                            }
+                        }
+                    }
+                    .icon-search {
+                        font-size: 19px;
+                    }
+
+                    .clear {
+                        border: none;
+                        background-color: transparent;
+                        cursor: pointer;
+                    }
+
+                    .clear,
+                    .loading {
+                        position: absolute;
+                        right: 50px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #616161;
+                        margin-top: 2px;
+                    }
+
+                    .loading {
+                        animation: spinner 0.8s linear infinite;
+                    }
+
+                    @keyframes spinner {
+                        from {
+                            transform: translateY(-50%) rotate(0);
+                        }
+                        to {
+                            transform: translateY(-50%) rotate(360deg);
                         }
                     }
                 }
@@ -96,11 +137,146 @@
                 padding: 5px;
                 border-radius: 5px;
                 cursor: pointer;
-                margin-left: 33px;
+                margin-left: 38px;
                 transition: background-color 0.3s linear;
 
                 &:hover {
-                    background-color: #D0E3D0;
+                    background-color: #d0e3d0;
+                }
+            }
+            .roomtable {
+                color: #616161;
+
+                .tableCell {
+                    background-color: whitesmoke;
+                    color: #616161;
+                    font-size: 15px;
+
+                    .cellWrapper {
+                        display: flex;
+                        align-items: center;
+
+                        .image {
+                            width: 100px;
+                            height: 100px;
+                            object-fit: cover;
+                            border: 1px dotted #31b0d5;
+                            border-radius: 4px;
+                            margin-right: 10px;
+                        }
+                    }
+
+                    span {
+                        background-color: #210876;
+                        color: white;
+                        padding: 5px 10px;
+                        cursor: pointer;
+                    }
+
+                    .status {
+                        padding: 5px;
+                        border-radius: 5px;
+
+                        &.Đặt {
+                            color: crimson;
+                            background-color: rgb(246, 233, 233);
+                        }
+
+                        &.Trống {
+                            color: green;
+                            background-color: rgba(0, 128, 0, 0.15);
+                        }
+                        &.Hỏng {
+                            color: goldenrod;
+                            background-color: rgba(173, 188, 1, 0.29);
+                        }
+                    }
+
+                    .btn + .btn {
+                        margin-left: 10px;
+                    }
+
+                    .updateBtn {
+                        padding: 4px 8px;
+                        border-radius: 5px;
+                        color: #31b0d5;
+                        border: 1px dotted #31b0d5;
+                        cursor: pointer;
+                        font-size: 15px;
+                        font-weight: 600;
+
+                        transition: background-color 0.3s linear;
+
+                        &:hover {
+                            background-color: #d2edf9;
+                        }
+                    }
+
+                    .deleteBtn {
+                        padding: 4px 8px;
+                        border-radius: 5px;
+                        color: crimson;
+                        border: 1px dotted rgba(220, 20, 60, 0.6);
+                        cursor: pointer;
+                        font-size: 15px;
+                        font-weight: 600;
+                        transition: background-color 0.3s linear;
+
+                        &:hover {
+                            background-color: rgb(246, 233, 233);
+                        }
+                    }
+
+                    .detailBtn {
+                        padding: 4px 8px;
+                        border-radius: 5px;
+                        color: goldenrod;
+                        border: 1px dotted goldenrod;
+                        cursor: pointer;
+                        font-size: 15px;
+                        font-weight: 600;
+                        transition: background-color 0.3s linear;
+
+                        &:hover {
+                            background-color: #e0e5ae;
+                        }
+                    }
+                }
+
+                .tabble-header {
+                    font-weight: 600;
+                    color: #210876;
+                    font-size: 16px;
+                }
+
+                .pagination {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-top: 20px;
+                }
+
+                .btn-action {
+                    text-align: end !important;
+                }
+
+                .name-room {
+                    width: 35%;
+                }
+
+                .type-room {
+                    width: 15%;
+                }
+
+                .no-data-message {
+                    font-size: 20px;
+                    color: #210876;
+                    font-weight: 600;
+                    padding: 20px 10px;
+
+                    .no-mess {
+                        color: red;
+                    }
                 }
             }
         }
