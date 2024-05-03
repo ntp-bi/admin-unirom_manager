@@ -1,12 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { Link } from "react-router-dom";
+import * as api from "../../../components/api/ApiFunction";
 import "./detail-room.scss";
 
 const DetailRoom = () => {
-    const [file, setFile] = useState(null);
+    const { roomId } = useParams();
+    const [room, setRoom] = useState(null);
+
+    useEffect(() => {
+        const fetchRoom = async () => {
+            try {
+                const roomData = await api.getRoomById(roomId);
+                console.log("Room data:", roomData); // Add this line
+                setRoom(roomData);
+            } catch (error) {
+                console.error("Error fetching room:", error);
+            }
+        };
+
+        fetchRoom();
+    }, [roomId]);
+
     return (
         <div className="detail">
             <Sidebar />
@@ -16,56 +34,62 @@ const DetailRoom = () => {
                     <span>Xem chi tiết thông tin phòng</span>
                 </div>
                 <div className="bottom">
+                    <div className="left">
+                        <div className="image">
+                            <img
+                                src={
+                                    room && room.img
+                                        ? room.img
+                                        : "/assets/person/no-image.png"
+                                }
+                                alt=""
+                                className="image"
+                            />
+                        </div>
+                    </div>
                     <div className="right">
-                        <form>
-                            <div className="formInput">
-                                <label>
-                                    Tên phòng:
-                                    <span className="info name-room">Phòng ABC</span>
-                                </label>
-                            </div>
-
-                            <div className="formInput">
-                                <label htmlFor="">
-                                    Loại phòng:
-                                    <span className="info type-room">Phòng VIP</span>
-                                </label>
-                            </div>
-                            <div className="formInput">
-                                <label>
-                                    Diện tích:
-                                    <span className="info area">100m2</span>
-                                </label>
-                            </div>
-                            <div className="formInput">
-                                <label>
-                                    Số lượng chỗ ngồi:
-                                    <span className="info count-seat">200</span>
-                                </label>
-                            </div>
-                            <div className="formInput">
-                                <label>
-                                    Mô tả:
-                                    <span className="info description">
-                                        Nguyễn Tâm Phước dzai vip pro
-                                    </span>
-                                </label>
-                            </div>
-                            <div className="formInput">
-                                <label htmlFor="file">Ảnh:</label>
-                                <span>
-                                    <img
-                                        src={
-                                            file
-                                                ? URL.createObjectURL(file)
-                                                : "/assets/person/no-image.png"
-                                        }
-                                        alt=""
-                                        className="image"
-                                    />
-                                </span>
-                            </div>
-                        </form>
+                        {room && (
+                            <form>
+                                <div className="formInput">
+                                    <label>
+                                        Tên phòng:
+                                        <span className="info name-room">
+                                            {room.nameRoom}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="formInput">
+                                    <label>
+                                        Loại phòng:
+                                        <span className="info type-room">
+                                            {room.roomType}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="formInput">
+                                    <label>
+                                        Diện tích:
+                                        <span className="info area">{room.area}m2</span>
+                                    </label>
+                                </div>
+                                <div className="formInput">
+                                    <label>
+                                        Số lượng chỗ ngồi:
+                                        <span className="info count-seat">
+                                            {room.countOfSeat}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="formInput">
+                                    <label>
+                                        <span className="desc">Mô tả:</span>
+                                        <span className="info description">
+                                            {room.description}
+                                        </span>
+                                    </label>
+                                </div>
+                            </form>
+                        )}
                         <div className="btn-action">
                             <Link to="/rooms">
                                 <button className="back">Trở về</button>

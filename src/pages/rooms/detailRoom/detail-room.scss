@@ -21,30 +21,31 @@
             }
 
             .left {
-                flex: 1;
-                text-align: center;
-
+                flex: 3;
                 .image {
-                    width: 250px;
-                    height: 250px;
-                    border-radius: 50%;
+                    width: 500px;
+                    height: 400px;
+                    border-radius: 10px;
                     object-fit: cover;
-                    // border: 1px solid gray;
+                    border: 1px solid gray;
                 }
             }
 
             .right {
-                flex: 2;
+                flex: 4;
+                margin-left: 50px;
+                position: relative;
 
                 form {
                     display: flex;
-                    flex-wrap: wrap;
+                    flex-direction: column;
+                    width: 100%;
                     gap: 30px;
                     justify-content: space-around;
                     position: relative;
 
                     .formInput {
-                        width: 40%;
+                        width: 100%;
 
                         label {
                             display: flex;
@@ -56,18 +57,6 @@
                             .icon {
                                 cursor: pointer;
                             }
-
-                            .area {
-                                margin-left: 12px;                            
-                            }
-
-                            .description {
-                                margin-left: 36px;
-                            }
-
-                            .type-room {
-                                margin-left: 50px;
-                            }
                         }
 
                         .info {
@@ -75,28 +64,19 @@
                             font-size: 16px;
                         }
 
-                        .select {
-                            border: 1px solid gray;
-                            width: 80%;
-                            padding: 4px;
-                            font-size: 14px;
-                            margin-top: 6px;
-                            outline: none;
+                        .desc {
+                            font-size: 16px;
+                            display: block;
+                            width: 80px;                          
                         }
                     }
-
-                    // .btn-add:hover {
-                    //     background-color: #c6e1ea;
-                    //     color: #fff;
-                    //     transition: 0.3s ease-in;
-                    // }
                 }
                 .btn-action {
                     .back {
                         color: goldenrod;
                         border: 1px dotted goldenrod;
                         margin-right: 50px;
-                        
+
                         &:hover {
                             background-color: #e0e5ae;
                         }
@@ -112,13 +92,16 @@
                     width: 100px;
                     border-radius: 5px;
                     cursor: pointer;
-                    float: right;
+                    // float: right;
+                    position: absolute;
+                    right: -30px;
+                    bottom: 20px;
                 }
             }
         }
 
         .bottom {
-            padding: 20px 0;
+            padding: 20px;
         }
     }
 }

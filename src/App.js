@@ -49,7 +49,7 @@ const router = createBrowserRouter([
         element: <Room />,
     },
     {
-        path: "/rooms/add-room",
+        path: "/rooms/rooms",
         element: <AddRoom />,
     },
     {
