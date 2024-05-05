@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import * as api from "../../../components/api/ApiFunction";
+import * as api from "../../../components/api/ApiRoom";
 import "./detail-room.scss";
 
 const DetailRoom = () => {
@@ -34,68 +34,72 @@ const DetailRoom = () => {
                     <span>Xem chi tiết thông tin phòng</span>
                 </div>
                 <div className="bottom">
-                    <div className="left">
-                        <div className="image">
-                            <img
-                                src={
-                                    room && room.img
-                                        ? room.img
-                                        : "/assets/person/no-image.png"
-                                }
-                                alt=""
-                                className="image"
-                            />
-                        </div>
-                    </div>
-                    <div className="right">
-                        {room && (
-                            <form>
-                                <div className="formInput">
-                                    <label>
-                                        Tên phòng:
-                                        <span className="info name-room">
-                                            {room.nameRoom}
-                                        </span>
-                                    </label>
+                    {room && (
+                        <>
+                            <div className="left">
+                                <div className="image">
+                                    <img
+                                        src={
+                                            room && room.img
+                                                ? room.img
+                                                : "/assets/person/no-image.png"
+                                        }
+                                        alt=""
+                                        className="image"
+                                    />
                                 </div>
-                                <div className="formInput">
-                                    <label>
-                                        Loại phòng:
-                                        <span className="info type-room">
-                                            {room.roomType}
-                                        </span>
-                                    </label>
+                            </div>
+                            <div className="right">
+                                <form>
+                                    <div className="formInput">
+                                        <label>
+                                            Tên phòng:
+                                            <span className="info name-room">
+                                                {room.nameRoom}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="formInput">
+                                        <label>
+                                            Loại phòng:
+                                            <span className="info type-room">
+                                                {room.roomType}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="formInput">
+                                        <label>
+                                            Diện tích:
+                                            <span className="info area">
+                                                {room.area}m2
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="formInput">
+                                        <label>
+                                            Số lượng chỗ ngồi:
+                                            <span className="info count-seat">
+                                                {room.countOfSeat}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="formInput">
+                                        <label>
+                                            <span className="desc">Mô tả:</span>
+                                            <span className="info description">
+                                                {room.description}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </form>
+                                <div className="btn-action">
+                                    <Link to="/rooms">
+                                        <button className="back">Trở về</button>
+                                    </Link>
                                 </div>
-                                <div className="formInput">
-                                    <label>
-                                        Diện tích:
-                                        <span className="info area">{room.area}m2</span>
-                                    </label>
-                                </div>
-                                <div className="formInput">
-                                    <label>
-                                        Số lượng chỗ ngồi:
-                                        <span className="info count-seat">
-                                            {room.countOfSeat}
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="formInput">
-                                    <label>
-                                        <span className="desc">Mô tả:</span>
-                                        <span className="info description">
-                                            {room.description}
-                                        </span>
-                                    </label>
-                                </div>
-                            </form>
-                        )}
-                        <div className="btn-action">
-                            <Link to="/rooms">
-                                <button className="back">Trở về</button>
-                            </Link>
-                        </div>
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

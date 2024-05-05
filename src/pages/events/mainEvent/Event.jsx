@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -19,44 +21,17 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../../components/services/searchService";
+import * as api from "../../../components/api/ApiEvent";
 
 import "./event.scss";
 
-const rows = [
-    {
-        id: "1",
-        nameEvent: "DRIVETEC 063 CAR BATTERY",
-    },
-    {
-        id: "2",
-        nameEvent: "Trung đi lấy chồng",
-    },
-    {
-        id: "3",
-        nameEvent: "DRIVETEC",
-    },
-    {
-        id: "4",
-        nameEvent: "CAR BATTERY",
-    },
-    {
-        id: "5",
-        nameEvent: "DRIVETEC BATTERY",
-    },
-    {
-        id: "6",
-        nameEvent: "DRIVETEC BATTERY",
-    },
-    {
-        id: "7",
-        nameEvent: "DRIVETEC BATTERY",
-    },
-];
-
 const Event = () => {
+    const [events, setEvents] = useState([]);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [filteredRows, setFilteredRows] = useState(rows);
+    const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [filteredRows, setFilteredRows] = useState([]); // State lưu trữ dữ liệu đã lọc
+    const [dataLoaded, setDataLoaded] = useState(false); // State kiểm tra xem dữ liệu đã được tải hay chưa
 
     const [page, setPage] = useState(1);
     const rowsPerPage = 5;
@@ -66,26 +41,53 @@ const Event = () => {
     const inputRef = useRef();
 
     useEffect(() => {
+        fetchRooms(); // Gọi hàm fetchRooms khi component được render
+    }, []);
+
+    // Hàm gọi API để lấy danh sách sự kiện
+    const fetchRooms = async () => {
+        try {
+            setIsLoading(true);
+            const result = await api.getAllEvent();
+            setEvents(result);
+            setFilteredRows(result); // Cập nhật lại danh sách khi xóa
+            setIsLoading(false);
+            setDataLoaded(true);
+        } catch (error) {
+            setIsLoading(false);
+            toast.error(`Có lỗi: ${error.message}`);
+        }
+    };
+
+    // Lọc dữ liệu khi có sự thay đổi trong các trạng thái lọc và từ khóa tìm kiếm
+    useEffect(() => {
+        if (dataLoaded) {
+            // Chỉ lọc dữ liệu khi dữ liệu đã được tải
+            filterRows(debouncedValue);
+        }
+    }, [dataLoaded]);
+
+    // Hàm xử lý tìm kiếm khi có sự thay đổi trong từ khóa tìm kiếm
+    useEffect(() => {
         const fetchApi = async () => {
-            setLoading(true);
+            setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue);
+            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
-            setLoading(false);
-            return result;
+            setLoadingSearch(false); // Kết thúc tải dữ liệu
+            return result; // Trả về kết quả
         };
 
-        // Kiểm tra xem debouncedValue có thay đổi từ giá trị trước không
-        // và không phải là chuỗi rỗng
+        // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
         if (debouncedValue.trim() !== "" && search.trim() !== "") {
-            fetchApi();
+            fetchApi(); // Gọi hàm fetchApi
         }
     }, [debouncedValue]);
 
     const handleClear = () => {
         setSearch("");
         inputRef.current.focus();
-        setFilteredRows(rows);
+        setFilteredRows(events);
     };
 
     const handleSearchChange = (event) => {
@@ -104,14 +106,41 @@ const Event = () => {
     };
 
     const filterRows = (searchTerm) => {
-        const filteredRows = rows.filter((row) => {
+        const filteredRows = events.filter((event) => {
             const nameMatch =
                 !searchTerm ||
-                row.nameEvent.toLowerCase().includes(searchTerm.toLowerCase());
+                event.eventName.toLowerCase().includes(searchTerm.toLowerCase());
             return nameMatch;
         });
 
         setFilteredRows(filteredRows);
+        setPage(1); // Reset trang về trang đầu tiên sau khi lọc
+    };
+
+    // Hàm xử lý xóa sự kiện
+    const handleDelete = async (eventId) => {
+        // Hiển thị hộp thoại xác nhận
+        const confirmed = window.confirm("Bạn có chắc chắn muốn xóa sự kiện này không?");
+        if (confirmed) {
+            try {
+                const result = await api.deleteEvent(eventId); // Gọi API xóa sự kiện
+                if (result) {
+                    // Nếu kết quả trả về không rỗng (xóa sự kiện thành công)
+                    toast.success(`Sự kiện ${eventId} đã được xóa thành công!`);
+                    fetchRooms();
+                } else {
+                    // Nếu kết quả trả về rỗng (có lỗi xảy ra)
+                    toast.error(`Có lỗi khi xóa sự kiện.`);
+                }
+            } catch (error) {
+                toast.error(`Có lỗi: ${error.message}`);
+            }
+        }
+        setTimeout(() => {
+            toast.dismiss();
+        }, 3000);
+
+        setPage(1);
     };
 
     return (
@@ -133,12 +162,12 @@ const Event = () => {
                                 value={search}
                                 onChange={handleSearchChange}
                             />
-                            {!!search && !loading && (
+                            {!!search && !loadingSearch && (
                                 <button className="clear" onClick={handleClear}>
                                     <CancelIcon className="icon-search" />
                                 </button>
                             )}
-                            {loading && (
+                            {loadingSearch && (
                                 <RotateRightOutlinedIcon className="loading icon-search" />
                             )}
 
@@ -154,75 +183,94 @@ const Event = () => {
                             <span>Thêm mới </span>
                         </Link>
                     </div>
-                    <div className="eventtable">
-                        <TableContainer component={Paper} className="tablecontainer">
-                            {filteredRows.length === 0 && (
-                                <div className="no-data-message">
-                                    Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                    <span className="no-mess">{search}</span>
-                                </div>
-                            )}
-                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                {filteredRows.length > 0 && (
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="tableCell tabble-header">
-                                                Mã sự kiện
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Tên sự kiện
-                                            </TableCell>
-                                            <TableCell
-                                                className="tableCell tabble-header"
-                                                colSpan={2}
-                                                align="center"
-                                            >
-                                                Thao tác
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                )}
-                                <TableBody>
-                                    {filteredRows
-                                        .slice(
-                                            (page - 1) * rowsPerPage,
-                                            page * rowsPerPage
-                                        )
-                                        .map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell className="tableCell id-event">
-                                                    {row.id}
-                                                </TableCell>
-                                                <TableCell className="tableCell name-event">
-                                                    {row.nameEvent}
-                                                </TableCell>
-                                                <TableCell className="tableCell btn-action">
-                                                    <button className="deleteBtn btn">
-                                                        Xóa
-                                                    </button>
-                                                    <Link
-                                                        to="/events/update-event/123"
-                                                        className="btn"
+                    {isLoading ? (
+                        <p>Đang tải dữ liệu...</p>
+                    ) : (
+                        <>
+                            <div className="eventtable">
+                                <TableContainer
+                                    component={Paper}
+                                    className="tablecontainer"
+                                >
+                                    {filteredRows.length === 0 && (
+                                        <div className="no-data-message">
+                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
+                                            <span className="no-mess">{search}</span>
+                                        </div>
+                                    )}
+                                    <Table
+                                        sx={{ minWidth: 650 }}
+                                        aria-label="simple table"
+                                    >
+                                        {filteredRows.length > 0 && (
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Mã sự kiện
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Tên sự kiện
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className="tableCell tabble-header"
+                                                        colSpan={2}
+                                                        align="center"
                                                     >
-                                                        <button className="updateBtn">
-                                                            Cập nhật
-                                                        </button>
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        {filteredRows.length > 0 && (
-                            <Pagination
-                                className="pagination"
-                                count={Math.ceil(filteredRows.length / rowsPerPage)}
-                                page={page}
-                                onChange={handleChangePage}
-                            />
-                        )}
-                    </div>
+                                                        Thao tác
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                        )}
+                                        <TableBody>
+                                            {filteredRows
+                                                .slice(
+                                                    (page - 1) * rowsPerPage,
+                                                    page * rowsPerPage
+                                                )
+                                                .map((event) => (
+                                                    <TableRow key={event.id}>
+                                                        <TableCell className="tableCell id-event">
+                                                            {event.id}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell name-event">
+                                                            {event.eventName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell btn-action">
+                                                            <button
+                                                                className="deleteBtn btn"
+                                                                onClick={() =>
+                                                                    handleDelete(event.id)
+                                                                }
+                                                            >
+                                                                Xóa
+                                                            </button>
+                                                            <Link
+                                                                to={`/events/update-event/${event.id}`}
+                                                                className="btn"
+                                                            >
+                                                                <button className="updateBtn">
+                                                                    Cập nhật
+                                                                </button>
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                {filteredRows.length > 0 && (
+                                    <Pagination
+                                        className="pagination"
+                                        count={Math.ceil(
+                                            filteredRows.length / rowsPerPage
+                                        )}
+                                        page={page}
+                                        onChange={handleChangePage}
+                                    />
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -30,79 +32,19 @@ import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../../components/services/searchService";
 
+import * as api from "../../../components/api/ApiHistories"
+
 import "./main-history.scss";
 
 dayjs.locale("vi"); // Set locale to Vietnamese
 
-export const rows = [
-    {
-        id: "DRBDM061",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "24/04/2024 12:00:00",
-        ReturnTime: "24/04/2024 14:00:00",
-        EndTime: "24/04/2024 14:00:00",
-        status: "completed",
-    },
-    {
-        id: "DRBDM062",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "25/04/2024 12:00:00",
-        ReturnTime: "25/04/2024 14:00:00",
-        EndTime: "25/04/2024 14:00:00",
-        status: "pending",
-    },
-
-    {
-        id: "DRBDM064",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "27/04/2024 12:00:00",
-        ReturnTime: "27/04/2024 14:00:00",
-        EndTime: "27/04/2024 14:00:00",
-        status: "pending",
-    },
-    {
-        id: "DRBDM06",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "28/04/2024 12:00:00",
-        ReturnTime: "28/04/2024 14:00:00",
-        EndTime: "28/04/2024 14:00:00",
-        status: "completed",
-    },
-    {
-        id: "DRBDM063",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "24/04/2024 12:00:00",
-        ReturnTime: "24/04/2024 14:00:00",
-        EndTime: "24/04/2024 14:00:00",
-        status: "pending",
-    },
-    {
-        id: "DRBDM063",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        fullName: "Nguyễn Tâm Phước",
-        ReserveTime: "24/04/2024 12:00:00",
-        ReturnTime: "24/04/2024 14:00:00",
-        EndTime: "24/04/2024 14:00:00",
-        status: "completed",
-    },
-];
-
 const History = () => {
-    const [status, setStatus] = useState("");
+    const [histories, setHistories] = useState([]);
+    const [status, setStatus] = useState(0);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [filteredRows, setFilteredRows] = useState(rows);
+    const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [filteredRows, setFilteredRows] = useState([]); // State lưu trữ dữ liệu đã lọc
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
 
     const [page, setPage] = useState(1);
@@ -112,29 +54,47 @@ const History = () => {
 
     const inputRef = useRef();
 
-    const statuses = [...new Set(rows.map((row) => row.status))];
+    const statuses = [...new Set(histories.map((history) => history.status))];
 
     useEffect(() => {
+        fetchHistories(); // Gọi hàm fetchHistories khi component được render
+    }, []);
+
+    // Hàm gọi API để lấy danh sách sự kiện
+    const fetchHistories = async () => {
+        try {
+            setIsLoading(true);
+            const result = await api.getAllHistory();
+            setHistories(result);
+            setFilteredRows(result); // Cập nhật lại danh sách khi xóa
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+            toast.error(`Có lỗi: ${error.message}`);
+        }
+    };
+
+    // Hàm xử lý tìm kiếm khi có sự thay đổi trong từ khóa tìm kiếm
+    useEffect(() => {
         const fetchApi = async () => {
-            setLoading(true);
+            setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue);
+            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
-            setLoading(false);
-            return result;
+            setLoadingSearch(false); // Kết thúc tải dữ liệu
+            return result; // Trả về kết quả
         };
 
-        // Kiểm tra xem debouncedValue có thay đổi từ giá trị trước không
-        // và không phải là chuỗi rỗng
+        // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
         if (debouncedValue.trim() !== "" && search.trim() !== "") {
-            fetchApi();
+            fetchApi(); // Gọi hàm fetchApi
         }
     }, [debouncedValue]);
 
     const handleClear = () => {
         setSearch("");
         inputRef.current.focus();
-        setFilteredRows(rows);
+        setFilteredRows(histories);
     };
 
     const handleSearchChange = (event) => {
@@ -150,8 +110,9 @@ const History = () => {
 
     // Xử lý khi trạng thái thay đổi
     const handleStatusChange = (event) => {
-        setStatus(event.target.value);
-        filterRows(event.target.value, search, selectedDateRange);
+        const selectedStatus = parseInt(event.target.value); // Chuyển đổi giá trị sang kiểu number
+        setStatus(selectedStatus);
+        filterRows(selectedStatus, search, selectedDateRange);
     };
 
     // Xử lý khi click vào button tìm kiếm
@@ -161,15 +122,21 @@ const History = () => {
 
     const filterRows = (selectedStatus, searchTerm, dateRange) => {
         const [startDate, endDate] = dateRange;
-        const filteredRows = rows.filter((row) => {
-            const statusMatch =
-                !selectedStatus ||
-                row.status.toLowerCase() === selectedStatus.toLowerCase();
+        const filteredRows = histories.filter((history) => {
+            const statusMatch = !selectedStatus || history.status === selectedStatus;
             const nameMatch =
                 !searchTerm ||
-                row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                row.nameRoom.toLowerCase().includes(searchTerm.toLowerCase());
-            const reserveTime = dayjs(row.ReserveTime, "DD/MM/YYYY HH:mm:ss");
+                (typeof searchTerm === "string" &&
+                    searchTerm.trim() !== "" &&
+                    ((history.fullName &&
+                        history.fullName
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())) ||
+                        (history.roomName &&
+                            history.roomName
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase()))));
+            const reserveTime = dayjs(history.reserveTime, "DD/MM/YYYY HH:mm:ss");
             const timeMatch =
                 (!startDate || reserveTime >= startDate) &&
                 (!endDate || reserveTime <= endDate.endOf("day"));
@@ -199,7 +166,7 @@ const History = () => {
                             value={status}
                             onChange={handleStatusChange}
                         >
-                            <option value="">-- Trạng thái --</option>
+                            <option value="">-- Chọn trạng thái --</option>
                             {statuses.map((status) => (
                                 <option key={status} value={status}>
                                     {status}
@@ -225,12 +192,12 @@ const History = () => {
                                 value={search}
                                 onChange={handleSearchChange}
                             />
-                            {!!search && !loading && (
+                            {!!search && !loadingSearch && (
                                 <button className="clear" onClick={handleClear}>
                                     <CancelIcon className="icon-search" />
                                 </button>
                             )}
-                            {loading && (
+                            {loadingSearch && (
                                 <RotateRightOutlinedIcon className="loading icon-search" />
                             )}
 
@@ -239,108 +206,122 @@ const History = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="historytable">
-                        <TableContainer component={Paper} className="tablecontainer">
-                            {filteredRows.length === 0 && (
-                                <div className="no-data-message">
-                                    Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                    <span className="no-mess">{search}</span>
-                                </div>
-                            )}
-                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    {isLoading ? (
+                        <p>Đang tải dữ liệu...</p>
+                    ) : (
+                        <>
+                            <div className="historytable">
+                                <TableContainer
+                                    component={Paper}
+                                    className="tablecontainer"
+                                >
+                                    {filteredRows.length === 0 && (
+                                        <div className="no-data-message">
+                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
+                                            <span className="no-mess">{search}</span>
+                                        </div>
+                                    )}
+                                    <Table
+                                        sx={{ minWidth: 650 }}
+                                        aria-label="simple table"
+                                    >
+                                        {filteredRows.length > 0 && (
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Tên phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Họ tên
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Loại phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Thời gian đặt
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Thời gian trả
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Thời gian kết thúc
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Trạng thái
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className="tableCell tabble-header"
+                                                        colSpan={2}
+                                                        align="center"
+                                                    >
+                                                        Thao tác
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                        )}
+                                        <TableBody>
+                                            {filteredRows
+                                                .slice(
+                                                    (page - 1) * rowsPerPage,
+                                                    page * rowsPerPage
+                                                )
+                                                .map((history) => (
+                                                    <TableRow key={history.id}>
+                                                        <TableCell className="tableCell">
+                                                            <div className="cellWrapper">
+                                                                {history.roomName}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.fullName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.typeRoom}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.reserveTime}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.returnTime}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.endTime}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            <span
+                                                                className={`status ${history.status}`}
+                                                            >
+                                                                {history.status}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell className="tableCell btn-action">
+                                                            <Link
+                                                                to={`/histories/detail-history/${history.id}`}
+                                                                className="btn"
+                                                            >
+                                                                <button className="detailBtn">
+                                                                    Xem chi tiết
+                                                                </button>
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                                 {filteredRows.length > 0 && (
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="tableCell tabble-header">
-                                                Tên phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Họ tên
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Loại phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Thời gian đặt
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Thời gian trả
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Thời gian kết thúc
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Trạng thái
-                                            </TableCell>
-                                            <TableCell
-                                                className="tableCell tabble-header"
-                                                colSpan={2}
-                                                align="center"
-                                            >
-                                                Thao tác
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
+                                    <Pagination
+                                        className="pagination"
+                                        count={Math.ceil(
+                                            filteredRows.length / rowsPerPage
+                                        )}
+                                        page={page}
+                                        onChange={handleChangePage}
+                                    />
                                 )}
-                                <TableBody>
-                                    {filteredRows
-                                        .slice(
-                                            (page - 1) * rowsPerPage,
-                                            page * rowsPerPage
-                                        )
-                                        .map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell className="tableCell">
-                                                    <div className="cellWrapper">
-                                                        {row.nameRoom}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.fullName}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.roomType}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.ReserveTime}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.ReturnTime}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.EndTime}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    <span
-                                                        className={`status ${row.status}`}
-                                                    >
-                                                        {row.status}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="tableCell btn-action">
-                                                    <Link
-                                                        to="/historys/detail-history/123"
-                                                        className="btn"
-                                                    >
-                                                        <button className="detailBtn">
-                                                            Xem chi tiết
-                                                        </button>
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        {filteredRows.length > 0 && (
-                            <Pagination
-                                className="pagination"
-                                count={Math.ceil(filteredRows.length / rowsPerPage)}
-                                page={page}
-                                onChange={handleChangePage}
-                            />
-                        )}
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

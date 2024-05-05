@@ -5,13 +5,11 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import {
-    updateRoom,
-    getRoomById,
-    getAllRooms,
-} from "../../../components/api/ApiFunction";
+import { updateRoom, getRoomById, getAllRooms } from "../../../components/api/ApiRoom";
 
 const UpdateRoom = () => {
+    const { roomId } = useParams();
+
     const [room, setRoom] = useState({
         img: null,
         nameRoom: "",
@@ -23,19 +21,6 @@ const UpdateRoom = () => {
 
     const [roomTypes, setRoomTypes] = useState([]);
     const [imagePreview, setImagePreview] = useState("");
-
-    const { roomId } = useParams();
-
-    const handleRoomInputChange = (e) => {
-        const { name, value } = e.target;
-        setRoom({ ...room, [name]: value });
-    };
-
-    const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        setRoom({ ...room, img: selectedImage });
-        setImagePreview(URL.createObjectURL(selectedImage));
-    };
 
     useEffect(() => {
         const fetchRoomTypes = async () => {
@@ -63,16 +48,37 @@ const UpdateRoom = () => {
         fetchRoom();
     }, [roomId]);
 
+    const handleRoomInputChange = (e) => {
+        const { name, value } = e.target;
+        setRoom({ ...room, [name]: value });
+    };
+
+    const handleImageChange = (e) => {
+        const selectedImage = e.target.files[0];
+        // Kiểm tra xem selectedImage có tồn tại không và có phải là đối tượng File không
+        if (selectedImage instanceof File) {
+            // Tạo một đối tượng FileReader để đọc dữ liệu của tệp hình ảnh
+            const reader = new FileReader();
+            reader.onload = () => {
+                // Khi FileReader đọc xong, gán dữ liệu hình ảnh vào thuộc tính img của newRoom
+                setRoom((prevRoom) => ({ ...prevRoom, img: reader.result }));
+                // Hiển thị xem trước hình ảnh
+                setImagePreview(reader.result);
+            };
+            // Bắt đầu đọc dữ liệu của tệp hình ảnh
+            reader.readAsDataURL(selectedImage);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("Room Data to be updated:", room); // Xem dữ liệu phòng trước khi gửi đi
 
         try {
             const response = await updateRoom(roomId, room);
+            console.log("Update Room Response:", response); // Xem phản hồi từ server
             if (response.status === 200) {
                 toast.success("Cập nhật phòng thành công!");
-                const updateRoomData = await getRoomById(roomId);
-                setRoom(updateRoomData);
-                setImagePreview(updateRoomData.img);
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật phòng!");
             }
@@ -93,17 +99,18 @@ const UpdateRoom = () => {
                     <div className="bottom">
                         <form onSubmit={handleSubmit}>
                             <div className="left">
-                                {imagePreview && (
-                                    <img
-                                        src={`data:image/jpeg;base64, ${imagePreview}`}
-                                        alt="Image Room"
-                                        className="image"
-                                    />
-                                )}
+                                <img
+                                    src={
+                                        imagePreview
+                                            ? imagePreview
+                                            : "/assets/person/no-image.png"
+                                    }
+                                    alt="Image Room"
+                                    className="image"
+                                />
 
                                 <div className="formInput">
                                     <input
-                                        required
                                         id="img"
                                         name="img"
                                         type="file"

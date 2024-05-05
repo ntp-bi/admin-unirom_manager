@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { addRoom, getAllRooms } from "../../../components/api/ApiFunction";
+import { addRoom, getAllRooms } from "../../../components/api/ApiRoom";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -39,14 +39,25 @@ const AddRoom = () => {
 
     const handleImageChange = (e) => {
         const selectedImage = e.target.files[0];
-        setNewRoom({ ...newRoom, img: selectedImage });
-        setImagePreview(URL.createObjectURL(selectedImage));
+        // Kiểm tra xem selectedImage có tồn tại không và có phải là đối tượng File không
+        if (selectedImage instanceof File) {
+            // Tạo một đối tượng FileReader để đọc dữ liệu của tệp hình ảnh
+            const reader = new FileReader();
+            reader.onload = () => {
+                // Khi FileReader đọc xong, gán dữ liệu hình ảnh vào thuộc tính img của newRoom
+                setNewRoom((prevRoom) => ({ ...prevRoom, img: reader.result }));
+                // Hiển thị xem trước hình ảnh
+                setImagePreview(reader.result);
+            };
+            // Bắt đầu đọc dữ liệu của tệp hình ảnh
+            reader.readAsDataURL(selectedImage);
+        }
     };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const updatedRooms = await addRoom(
+            await addRoom(
                 newRoom.img,
                 newRoom.nameRoom,
                 newRoom.roomType,
@@ -54,7 +65,6 @@ const AddRoom = () => {
                 newRoom.countOfSeat,
                 newRoom.description
             );
-            setRoomTypes(updatedRooms); // Cập nhật state roomTypes với danh sách phòng mới
             toast.success("Phòng đã được thêm vào cơ sở dữ liệu");
             setNewRoom({
                 img: null,

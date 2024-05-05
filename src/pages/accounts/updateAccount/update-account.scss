@@ -1,8 +1,8 @@
-.add__account {
+.update__account {
     width: 100%;
     display: flex;
 
-    .addContainer {
+    .updateContainer {
         flex: 6;
         .top,
         .bottom {
@@ -100,8 +100,6 @@
         .bottom {
             padding: 20px 0;
             min-height: 250px;
-            border-radius: 4px;
-            border-top: 3px solid #31b0d5;  
         }
     }
 }

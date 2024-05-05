@@ -20,7 +20,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../../components/services/searchService";
-import * as api from "../../../components/api/ApiFunction";
+import * as api from "../../../components/api/ApiRoom";
 import "./room.scss";
 
 const Room = () => {
@@ -166,6 +166,8 @@ const Room = () => {
         setTimeout(() => {
             toast.dismiss();
         }, 3000);
+        setPage(1);
+
     };
 
     return (
@@ -224,7 +226,7 @@ const Room = () => {
                             </button>
                         </div>
                         <Link
-                            to="/rooms/rooms"
+                            to="/rooms/add-room"
                             style={{ textDecoration: "none" }}
                             className="link"
                         >
@@ -253,7 +255,7 @@ const Room = () => {
                                         aria-label="simple table"
                                     >
                                         {filteredRows.length > 0 && (
-                                            <TableHead>
+                                            <TableHead >
                                                 <TableRow>
                                                     <TableCell className="tableCell tabble-header">
                                                         Ảnh

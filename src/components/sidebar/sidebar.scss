@@ -4,7 +4,7 @@
 
     min-height: 100vh;
     border-right: 0.5px solid lightgray;
-    background-color: whitesmoke;
+    background-color: #222D32;
     transition: 0.5s all ease-in;
 
     &.active {
@@ -29,18 +29,19 @@
         height: 50px;
         align-items: center;
         justify-content: center;
+        background-color: #367FA9;
 
         .logo {
             font-size: 20px;
             font-weight: bold;
-            color: #210876;
+            color: #fff;
             margin-right: 10px;
         }
 
         .menu__icon {
             position: relative;
             top: 3px;
-            color: #210876;
+            color: #fff;
             cursor: pointer;
         }
     }
@@ -54,7 +55,7 @@
             .title {
                 font-size: 17px;
                 font-weight: bold;
-                color: #616161;
+                color: #8aa4af;
                 margin-top: 15px;
                 margin-bottom: 5px;
                 margin-left: 10px;
@@ -70,7 +71,7 @@
 
                 &:hover {
                     // background-color: rgba($color: #dddd, $alpha: 1);
-                    background-color: #210876;
+                    background-color: #367FA9;
                     border-radius: 10px;
 
                     .icon {
@@ -84,12 +85,12 @@
 
                 .icon {
                     font-size: 26px;
-                    color: #210876;
+                    color: #fff;
                     padding-left: 6px;
                 }
 
                 &.active {
-                    background-color: #210876;
+                    background-color: #367FA9;
                     border-radius: 10px;
                     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 
@@ -105,7 +106,7 @@
             span {
                 font-size: 16px;
                 font-weight: 600;
-                color: #616161;
+                color: #fff;
                 margin-left: 10px;
             }
         }

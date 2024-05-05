@@ -19,10 +19,10 @@ const Navbar = () => {
         <div className="navbar">
             <div className="navbarContainer">
                 <div className="items">
-                    <div className="item">
+                    {/* <div className="item">
                         <LanguageOutlinedIcon className="icon" />
                         <span>Tiếng việt</span>
-                    </div>
+                    </div> */}
                     <div className="item">
                         <Switch
                             style={{ color: "#210876" }}
@@ -30,14 +30,14 @@ const Navbar = () => {
                             onClick={() => dispatch({ type: "TOGGLE" })}
                         />
                     </div>
-                    <div className="item">
+                    {/* <div className="item">
                         <NotificationsActiveOutlinedIcon className="icon" />
                         <div className="counter">3</div>
                     </div>
                     <div className="item">
                         <ChatBubbleOutlineOutlinedIcon className="icon" />
                         <div className="counter">5</div>
-                    </div>
+                    </div> */}
 
                     <div className="item account-item">
                         <button className="btn-avatar">

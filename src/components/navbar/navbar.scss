@@ -4,7 +4,7 @@
     align-items: center;
     font-size: 14px;
     color: #333;
-    background-color: whitesmoke;
+    background-color: #3c8dbc;
     border-bottom: 1px solid lightgray;
     flex: 6;
 
@@ -102,7 +102,7 @@
                     height: 30px;
                     border-radius: 50%;
                     object-fit: cover;
-                    border: 2px solid #210876;
+                    border: 2px solid #fff;
                     cursor: pointer;
                     padding: 1px;
                 }
@@ -121,7 +121,7 @@
         }
 
         .btn-login {
-            background-color: #31B0D5;
+            background-color: #31b0d5;
         }
 
         .btn-avatar {
@@ -131,6 +131,9 @@
             border-radius: 50%;
             position: relative;
             top: -2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 }
@@ -139,6 +142,6 @@
 //     color: #31B0D5 !important;
 // }
 
-// .MuiSwitch-switchBase {
-//     color: #31B0D5 !important;
-// }
+.MuiSwitch-switchBase {
+    color: #fff !important;
+}

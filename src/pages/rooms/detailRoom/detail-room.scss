@@ -24,10 +24,10 @@
                 flex: 3;
                 .image {
                     width: 500px;
-                    height: 400px;
+                    height: 300px;
                     border-radius: 10px;
                     object-fit: cover;
-                    border: 1px solid gray;
+                    border: 1px solid #dddd;
                 }
             }
 
@@ -67,7 +67,6 @@
                         .desc {
                             font-size: 16px;
                             display: block;
-                            width: 80px;                          
                         }
                     }
                 }
@@ -102,6 +101,7 @@
 
         .bottom {
             padding: 20px;
+            border-top: 3px solid #31b0d5;
         }
     }
 }

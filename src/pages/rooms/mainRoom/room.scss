@@ -1,7 +1,7 @@
 .room {
     display: flex;
     background-color: #f5f5f5;
-    color: #616161;
+    color: #616161;    
 
     .roomContainer {
         flex: 6;
@@ -12,7 +12,9 @@
             -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
             box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
             padding: 20px;
-            margin: 20px;
+            margin: 20px;      
+            border-top: 3px solid #31b0d5;    
+            border-radius: 4px; 
 
             .datatableTitle {
                 width: 100%;
@@ -145,12 +147,13 @@
                 }
             }
             .roomtable {
-                color: #616161;
-
+                color: #616161;                
+                               
                 .tableCell {
                     background-color: whitesmoke;
                     color: #616161;
                     font-size: 15px;
+
 
                     .cellWrapper {
                         display: flex;
@@ -279,6 +282,6 @@
                     }
                 }
             }
-        }
+        }        
     }
 }

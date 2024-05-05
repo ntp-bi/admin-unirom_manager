@@ -20,7 +20,7 @@ import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../components/services/searchService";
 
-import { deleteRoom, getAllRooms } from "../../components/api/ApiFunction";
+import { deleteRoom, getAllRooms } from "../../components/api/ApiRoom";
 
 import "./list.scss";
 

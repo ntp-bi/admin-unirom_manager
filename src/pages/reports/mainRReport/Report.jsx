@@ -10,184 +10,62 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
+import { fetchReportsByDate } from "../../../components/api/ApiReport";
+
 import "./main-report.scss";
 
-export const rows = [
-    {
-        id: "1",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        countReserve: "10",
-        countCanle: "2",
-        countEvent: "10",
-        countTeacher: "3",
-    },
-    {
-        id: "2",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        countReserve: "10",
-        countCanle: "2",
-        countEvent: "10",
-        countTeacher: "3",
-    },
-    {
-        id: "3",
-        nameRoom: "DRIVETEC 063 CAR BATTERY",
-        roomType: "DRIVETEC",
-        countReserve: "10",
-        countCanle: "2",
-        countEvent: "10",
-        countTeacher: "3",
-    },
-];
-
-export const rowsReportMostRoomBookingtable = [
-    {
-        roomId: 1,
-        roomName: "Phòng 304",
-        typeName: "Single",
-        area: 50.0,
-        img: "/assets/carbattery.jpg",
-        countOfSeats: 100,
-        description: "Phòng dài",
-    },
-    {
-        roomId: 2,
-        roomName: "Phòng 304",
-        typeName: "Single",
-        area: 50.0,
-        img: "/assets/carbattery.jpg",
-        countOfSeats: 100,
-        description: "Phòng dài",
-    },
-    {
-        roomId: 3,
-        roomName: "Phòng 304",
-        typeName: "Single",
-        area: 50.0,
-        img: "/assets/carbattery.jpg",
-        countOfSeats: 100,
-        description: "Phòng dài",
-    },
-    {
-        roomId: 4,
-        roomName: "Phòng 304",
-        typeName: "Single",
-        area: 50.0,
-        img: "/assets/carbattery.jpg",
-        countOfSeats: 100,
-        description: "Phòng dài",
-    },
-    {
-        roomId: 5,
-        roomName: "Phòng 304",
-        typeName: "Single",
-        area: 50.0,
-        img: "/assets/carbattery.jpg",
-        countOfSeats: 100,
-        description: "Phòng dài",
-    },
-];
-
 const Report = () => {
-    const [selectedDate, setSelectedDate] = useState({
-        day: "",
-        month: "",
-        year: "",
-    });
+    const [reports, setReports] = useState([]);
+    const [mostBookedRooms, setMostBookedRooms] = useState([]);
+    const [leastBookedRooms, setLeastBookedRooms] = useState([]);
 
-    const [statisticsData, setStatisticsData] = useState(null);
-    const [mostBookedRoom, setMostBookedRoom] = useState("");
+    const [selectedDay, setSelectedDay] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
 
-    const handleDateChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedDate((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
-    };
-
-    const handleStatistics = () => {
-        // Kiểm tra xem người dùng đã chọn đủ ngày, tháng, năm chưa
-        // if (!selectedDate.day || !selectedDate.month || !selectedDate.year) {
-        //     // Nếu không đủ thông tin, hiển thị cảnh báo và không tiếp tục tính toán dữ liệu
-        //     alert("Vui lòng chọn đầy đủ ngày, tháng và năm.");
-        //     return;
-        // }
-
-        // Tiếp tục tính toán dữ liệu thống kê nếu đã chọn đủ ngày, tháng, năm
-        const filteredRows = rows.filter((row) => {
-            // Kiểm tra xem ngày, tháng, năm của row có trùng khớp với selectedDate không
-            return (
-                row.day === selectedDate.day &&
-                row.month === selectedDate.month &&
-                row.year === selectedDate.year
+    const handleStatistics = async () => {
+        if (!selectedDay || !selectedMonth || !selectedYear) {
+            alert(
+                "Vui lòng chọn đầy đủ ngày, tháng và năm trước khi thực hiện thống kê."
             );
-        });
-
-        const totalReserve = filteredRows.reduce(
-            (total, row) => total + parseInt(row.countReserve),
-            0
-        );
-        const totalCancel = filteredRows.reduce(
-            (total, row) => total + parseInt(row.countCanle),
-            0
-        );
-        const totalEvent = filteredRows.reduce(
-            (total, row) => total + parseInt(row.countEvent),
-            0
-        );
-
-        setStatisticsData({
-            totalReserve,
-            totalCancel,
-            totalEvent,
-        });
-
-        const roomCounts = {};
-        rowsReportMostRoomBookingtable.forEach((row) => {
-            roomCounts[row.roomName] = (roomCounts[row.roomName] || 0) + 1;
-        });
-
-        let maxBookings = 0;
-        let mostBookedRoomName = "";
-        for (const roomName in roomCounts) {
-            if (roomCounts[roomName] > maxBookings) {
-                maxBookings = roomCounts[roomName];
-                mostBookedRoomName = roomName;
-            }
+            return;
         }
 
-        setMostBookedRoom(mostBookedRoomName);
-    };
+        // gọi hàm fetchReportsByDate từ API để lấy dữ liệu báo cáo dựa trên ngày, tháng và năm được chọn.
+        const data = await fetchReportsByDate(selectedDay, selectedMonth, selectedYear);
 
-    const years = Array.from(
-        { length: 10 },
-        (_, index) => new Date().getFullYear() - index
-    );
-
-    const renderSelectOptions = (start, end, placeholder, name) => {
-        const options = [];
-        for (let i = start; i <= end; i++) {
-            options.push(
-                <option key={i} value={i}>
-                    {i}
-                </option>
-            );
+        if (data) {
+            setReports(data);
+            //cập nhật state mostBookedRooms với thông tin về loại phòng được đặt nhiều nhất từ dữ liệu trả về.
+            setMostBookedRooms(data[0].theMostRoomTypeOfBooking);
+            setLeastBookedRooms(data[0].leastOfRoomTypeOfBooking);
+        } else {
+            setReports([]);
+            setMostBookedRooms([]);
+            setLeastBookedRooms([]);
         }
-        return (
-            <select
-                className="select"
-                name={name}
-                value={selectedDate[name]}
-                onChange={handleDateChange}
-            >
-                <option value="">{placeholder}</option>
-                {options}
-            </select>
-        );
     };
+
+    const handleDayChange = (event) => {
+        setSelectedDay(event.target.value);
+    };
+
+    const handleMonthChange = (event) => {
+        setSelectedMonth(event.target.value);
+    };
+
+    const handleYearChange = (event) => {
+        setSelectedYear(event.target.value);
+    };
+
+    // Tạo mảng chứa số ngày từ 1 đến 31
+    const days = Array.from({ length: 31 }, (_, index) => index + 1);
+
+    // Tạo mảng chứa số tháng từ 1 đến 12
+    const months = Array.from({ length: 12 }, (_, index) => index + 1);
+
+    // Tạo mảng chứa năm từ 2021 đến 2030 (ví dụ)
+    const years = Array.from({ length: 10 }, (_, index) => 2021 + index);
 
     return (
         <div className="report">
@@ -199,122 +77,237 @@ const Report = () => {
                         <span>Thống kê báo cáo</span>
                     </div>
                     <div className="reportSearch">
-                        {renderSelectOptions(1, 31, "-- Ngày --")}
-                        {renderSelectOptions(1, 12, "-- Tháng --")}
-                        {renderSelectOptions(
-                            years[years.length - 1] - 10,
-                            years[0],
-                            "-- Năm --"
-                        )}
+                        <select
+                            className="select"
+                            value={selectedDay}
+                            onChange={handleDayChange}
+                        >
+                            <option value="">Chọn ngày</option>
+                            {days.map((day) => (
+                                <option key={day} value={day}>
+                                    {day}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            className="select"
+                            value={selectedMonth}
+                            onChange={handleMonthChange}
+                        >
+                            <option value="">Chọn tháng</option>
+                            {months.map((month) => (
+                                <option key={month} value={month}>
+                                    {month}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            className="select"
+                            value={selectedYear}
+                            onChange={handleYearChange}
+                        >
+                            <option value="">Chọn năm</option>
+                            {years.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
+                        </select>
                         <button onClick={handleStatistics}>Thống kê</button>
                     </div>
-                    {statisticsData && (
-                        <div className="reporttable">
-                            <TableContainer component={Paper} className="tablecontainer">
-                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="tableCell tabble-header header-start">
-                                                Tên phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header header-start">
-                                                Loại phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Số lượng đặt
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Số lượng hủy
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Số lượng sự kiện
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {rows.map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell className="tableCell">
-                                                    <div className="cellWrapper name-room">
-                                                        {row.nameRoom}
-                                                    </div>
+
+                    <div className="reportDetails">
+                        {reports.length > 0 && (
+                            <div className="reporttable">
+                                <TableContainer
+                                    component={Paper}
+                                    className="tablecontainer"
+                                >
+                                    <Table
+                                        sx={{ minWidth: 650 }}
+                                        aria-label="simple table"
+                                    >
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell className="tableCell tabble-header">
+                                                    Số lượng đặt phòng
                                                 </TableCell>
-                                                <TableCell className="tableCell room-type">
-                                                    {row.roomType}
+                                                <TableCell className="tableCell tabble-header">
+                                                    Số lượng loại phòng
                                                 </TableCell>
-                                                <TableCell className="tableCell count-reserve">
-                                                    {row.countReserve}
+                                                <TableCell className="tableCell tabble-header">
+                                                    Số lượng giáo viên
                                                 </TableCell>
-                                                <TableCell className="tableCell count-canle">
-                                                    {row.countCanle}
+                                                <TableCell className="tableCell tabble-header">
+                                                    Số lượng trả phòng
                                                 </TableCell>
-                                                <TableCell className="tableCell count-event">
-                                                    {row.countEvent}
+                                                <TableCell className="tableCell tabble-header">
+                                                    Số lượng sự kiện
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </div>
-                    )}
-                    <div className="datatableTitle second">
-                        <span>Số lượng phòng được đặt nhiều nhất</span>
+                                        </TableHead>
+                                        <TableBody>
+                                            {reports.map((report, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell className="tableCell">
+                                                        {report.countOfBookingRoom}
+                                                    </TableCell>
+                                                    <TableCell className="tableCell">
+                                                        {report.countOfRoomType}
+                                                    </TableCell>
+                                                    <TableCell className="tableCell">
+                                                        {report.countOfTeacher}
+                                                    </TableCell>
+                                                    <TableCell className="tableCell">
+                                                        {report.countOfReturnBookingRoom}
+                                                    </TableCell>
+                                                    <TableCell className="tableCell">
+                                                        {report.countOfEvent}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </div>
+                        )}
+
+                        {mostBookedRooms.length > 0 && (
+                            <div>
+                                <div className="datatableTitle second">
+                                    <span>Số lượng phòng được đặt nhiều nhất</span>
+                                </div>
+
+                                <div className="reporttable">
+                                    <TableContainer
+                                        component={Paper}
+                                        className="tablecontainer"
+                                    >
+                                        <Table
+                                            sx={{ minWidth: 650 }}
+                                            aria-label="simple table"
+                                        >
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Ảnh
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Tên phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Loại phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Diện tích
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Số lượng chỗ ngồi
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {mostBookedRooms.map((room) => (
+                                                    <TableRow key={room.roomId}>
+                                                        <TableCell className="tableCell header-img">
+                                                            <div className="cellWrapper">
+                                                                <img
+                                                                    src={room.photo}
+                                                                    alt=""
+                                                                    className="image"
+                                                                />
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="tableCell name-room most-room">
+                                                            {room.roomName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell room-type most-room">
+                                                            {room.typeName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {room.area}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {room.countOfSeats}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </div>
+                            </div>
+                        )}
+
+                        {leastBookedRooms.length > 0 && (
+                            <div>
+                                <div className="datatableTitle second">
+                                    <span>Số lượng phòng được đặt ít nhất</span>
+                                </div>
+
+                                <div className="reporttable">
+                                    <TableContainer
+                                        component={Paper}
+                                        className="tablecontainer"
+                                    >
+                                        <Table
+                                            sx={{ minWidth: 650 }}
+                                            aria-label="simple table"
+                                        >
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Ảnh
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Tên phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header header-start">
+                                                        Loại phòng
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Diện tích
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Số lượng chỗ ngồi
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {leastBookedRooms.map((room) => (
+                                                    <TableRow key={room.roomId}>
+                                                        <TableCell className="tableCell header-img">
+                                                            <div className="cellWrapper">
+                                                                <img
+                                                                    src={room.photo}
+                                                                    alt=""
+                                                                    className="image"
+                                                                />
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="tableCell name-room most-room">
+                                                            {room.roomName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell room-type most-room">
+                                                            {room.typeName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {room.area}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {room.countOfSeats}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    {mostBookedRoom && (
-                        <div className="reporttable">
-                            <TableContainer component={Paper} className="tablecontainer">
-                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="tableCell tabble-header header-start">
-                                                Ảnh
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header header-start">
-                                                Tên phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header header-start">
-                                                Loại phòng
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Diện tích
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Số lượng chỗ ngồi
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {rowsReportMostRoomBookingtable.map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell className="tableCell header-img">
-                                                    <div className="cellWrapper">
-                                                        <img
-                                                            src={row.img}
-                                                            alt=""
-                                                            className="image"
-                                                        />
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="tableCell name-room most-room">
-                                                    {row.roomName}
-                                                </TableCell>
-                                                <TableCell className="tableCell room-type most-room">
-                                                    {row.typeName}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.area}
-                                                </TableCell>
-                                                <TableCell className="tableCell">
-                                                    {row.countOfSeats}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

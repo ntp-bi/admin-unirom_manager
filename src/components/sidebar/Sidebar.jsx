@@ -8,10 +8,15 @@ import EventIcon from "@mui/icons-material/Event";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import "./sidebar.scss";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 const Sidebar = () => {
     const location = useLocation();
+    const { roomId } = useParams();
+    const { historyId } = useParams();
+    const { teacherId } = useParams();
+    const { accountId } = useParams();
+    const { eventId } = useParams();
 
     const [closeMenu, setCloseMenu] = useState(false);
 
@@ -42,28 +47,63 @@ const Sidebar = () => {
                     </Link>
                     <Link to="/rooms" style={{ textDecoration: "none" }}>
                         <h4 className="title">DANH SÁCH QUẢN LÝ</h4>
-                        <li className={location.pathname === "/rooms" ? "active" : ""}>
+                        <li
+                            className={
+                                location.pathname === "/rooms" ||
+                                location.pathname === "/rooms/add-room" ||
+                                location.pathname === `/rooms/update-room/${roomId}` ||
+                                location.pathname === `/rooms/detail-room/${roomId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
                             <DoorSlidingOutlinedIcon className="icon" />
                             <span>Phòng</span>
                         </li>
                     </Link>
 
                     <Link to="/events" style={{ textDecoration: "none" }}>
-                        <li className={location.pathname === "/events" ? "active" : ""}>
+                        <li
+                            className={
+                                location.pathname === "/events" ||
+                                location.pathname === "/events/add-event" ||
+                                location.pathname === `/events/update-event/${eventId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
                             <EventIcon className="icon" />
                             <span>Sự kiện</span>
                         </li>
                     </Link>
 
                     <Link to="/accounts" style={{ textDecoration: "none" }}>
-                        <li className={location.pathname === "/accounts" ? "active" : ""}>
+                        <li
+                            className={
+                                location.pathname === "/accounts" ||
+                                location.pathname === "/accounts/add-account" ||
+                                location.pathname ===
+                                    `/accounts/update-account/${accountId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
                             <Person3OutlinedIcon className="icon" />
                             <span>Tài khoản</span>
                         </li>
                     </Link>
 
                     <Link to="/teachers" style={{ textDecoration: "none" }}>
-                        <li className={location.pathname === "/teachers" ? "active" : ""}>
+                        <li
+                            className={
+                                location.pathname === "/teachers" ||
+                                location.pathname === "/teachers/add-teacher" ||
+                                location.pathname ===
+                                    `/teachers/update-teacher/${teacherId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
                             <GroupOutlinedIcon className="icon" />
                             <span>Giảng viên</span>
                         </li>
@@ -74,8 +114,16 @@ const Sidebar = () => {
                             <span>Thống kê báo cáo</span>
                         </li>
                     </Link>
-                    <Link to="/historys" style={{ textDecoration: "none" }}>
-                        <li className={location.pathname === "/historys" ? "active" : ""}>
+                    <Link to="/histories" style={{ textDecoration: "none" }}>
+                        <li
+                            className={
+                                location.pathname === "/histories" ||
+                                location.pathname ===
+                                    `/histories/detail-history/${historyId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
                             <HistoryOutlinedIcon className="icon" />
                             <span>Lịch sử đặt / hủy phòng</span>
                         </li>

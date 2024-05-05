@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -19,46 +21,17 @@ import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
 import * as searchServices from "../../../components/services/searchService";
+import * as api from "../../../components/api/ApiAccount";
 
 import "./main-account.scss";
 
-const rows = [
-    {
-        id: "1",
-        fullName: "Nguyễn Tâm Phước",
-        userAccount: "ntp",
-    },
-    {
-        id: "2",
-        fullName: "Nguyễn Tâm Phước",
-        userAccount: "ntp",
-    },
-    {
-        id: "3",
-        fullName: "Nguyễn Tâm Phước",
-        userAccount: "ntp",
-    },
-    {
-        id: "4",
-        fullName: "a",
-        userAccount: "abc",
-    },
-    {
-        id: "5",
-        fullName: "Nguyễn Tâm Phước",
-        userAccount: "ntp",
-    },
-    {
-        id: "6",
-        fullName: "Nguyễn Tâm Phước",
-        userAccount: "ntp",
-    },
-];
-
 const Account = () => {
+    const [account, setAccount] = useState([]);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [filteredRows, setFilteredRows] = useState(rows);
+    const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
+    const [filteredRows, setFilteredRows] = useState([]); // State lưu trữ dữ liệu đã lọc
+    const [dataLoaded, setDataLoaded] = useState(false); // State kiểm tra xem dữ liệu đã được tải hay chưa
 
     const [page, setPage] = useState(1);
     const rowsPerPage = 5;
@@ -68,26 +41,53 @@ const Account = () => {
     const inputRef = useRef();
 
     useEffect(() => {
+        fetchRooms(); // Gọi hàm fetchRooms khi component được render
+    }, []);
+
+    // Hàm gọi API để lấy danh sách sự kiện
+    const fetchRooms = async () => {
+        try {
+            setIsLoading(true);
+            const result = await api.getAllAccount();
+            setAccount(result);
+            setFilteredRows(result); // Cập nhật lại danh sách khi xóa
+            setIsLoading(false);
+            setDataLoaded(true);
+        } catch (error) {
+            setIsLoading(false);
+            toast.error(`Có lỗi: ${error.message}`);
+        }
+    };
+
+    // Lọc dữ liệu khi có sự thay đổi trong các trạng thái lọc và từ khóa tìm kiếm
+    useEffect(() => {
+        if (dataLoaded) {
+            // Chỉ lọc dữ liệu khi dữ liệu đã được tải
+            filterRows(debouncedValue);
+        }
+    }, [dataLoaded]);
+
+    // Hàm xử lý tìm kiếm khi có sự thay đổi trong từ khóa tìm kiếm
+    useEffect(() => {
         const fetchApi = async () => {
-            setLoading(true);
+            setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue);
+            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
-            setLoading(false);
-            return result;
+            setLoadingSearch(false); // Kết thúc tải dữ liệu
+            return result; // Trả về kết quả
         };
 
-        // Kiểm tra xem debouncedValue có thay đổi từ giá trị trước không
-        // và không phải là chuỗi rỗng
+        // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
         if (debouncedValue.trim() !== "" && search.trim() !== "") {
-            fetchApi();
+            fetchApi(); // Gọi hàm fetchApi
         }
     }, [debouncedValue]);
 
     const handleClear = () => {
         setSearch("");
         inputRef.current.focus();
-        setFilteredRows(rows);
+        setFilteredRows(account);
     };
 
     const handleSearchChange = (event) => {
@@ -106,14 +106,40 @@ const Account = () => {
     };
 
     const filterRows = (searchTerm) => {
-        const filteredRows = rows.filter((row) => {
+        const filteredRows = account.filter((account) => {
             const nameMatch =
                 !searchTerm ||
-                row.fullName.toLowerCase().includes(searchTerm.toLowerCase());
+                account.userName.toLowerCase().includes(searchTerm.toLowerCase());
             return nameMatch;
         });
 
         setFilteredRows(filteredRows);
+    };
+
+    // Hàm xử lý xóa sự kiện
+    const handleDelete = async (accountId) => {
+        // Hiển thị hộp thoại xác nhận
+        const confirmed = window.confirm("Bạn có chắc chắn muốn xóa sự kiện này không?");
+        if (confirmed) {
+            try {
+                const result = await api.deleteAccount(accountId); // Gọi API xóa sự kiện
+                if (result) {
+                    // Nếu kết quả trả về không rỗng (xóa sự kiện thành công)
+                    toast.success(`Tài khoản ${accountId} đã được xóa thành công!`);
+                    fetchRooms();
+                } else {
+                    // Nếu kết quả trả về rỗng (có lỗi xảy ra)
+                    toast.error(`Có lỗi khi xóa sự kiện.`);
+                }
+            } catch (error) {
+                toast.error(`Có lỗi: ${error.message}`);
+            }
+        }
+        setTimeout(() => {
+            toast.dismiss();
+        }, 3000);
+
+        setPage(1);
     };
 
     return (
@@ -135,12 +161,12 @@ const Account = () => {
                                 value={search}
                                 onChange={handleSearchChange}
                             />
-                            {!!search && !loading && (
+                            {!!search && !loadingSearch && (
                                 <button className="clear" onClick={handleClear}>
                                     <CancelIcon className="icon-search" />
                                 </button>
                             )}
-                            {loading && (
+                            {loadingSearch && (
                                 <RotateRightOutlinedIcon className="loading icon-search" />
                             )}
 
@@ -156,75 +182,100 @@ const Account = () => {
                             <span>Thêm mới </span>
                         </Link>
                     </div>
-                    <div className="accounttable">
-                        <TableContainer component={Paper} className="tablecontainer">
-                            {filteredRows.length === 0 && (
-                                <div className="no-data-message">
-                                    Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                    <span className="no-mess">{search}</span>
-                                </div>
-                            )}
-                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                {filteredRows.length > 0 && (
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="tableCell tabble-header">
-                                                Họ tên
-                                            </TableCell>
-                                            <TableCell className="tableCell tabble-header">
-                                                Tên tài khoản
-                                            </TableCell>
-                                            <TableCell
-                                                className="tableCell tabble-header"
-                                                colSpan={2}
-                                                align="center"
-                                            >
-                                                Thao tác
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                )}
-                                <TableBody>
-                                    {filteredRows
-                                        .slice(
-                                            (page - 1) * rowsPerPage,
-                                            page * rowsPerPage
-                                        )
-                                        .map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell className="tableCell name-account">
-                                                    {row.fullName}
-                                                </TableCell>
-                                                <TableCell className="tableCell user-account">
-                                                    {row.userAccount}
-                                                </TableCell>
-                                                <TableCell className="tableCell btn-action">
-                                                    <button className="deleteBtn btn">
-                                                        Xóa
-                                                    </button>
-                                                    <Link
-                                                        to="/accounts/update-account/123"
-                                                        className="btn"
+                    {isLoading ? (
+                        <p>Đang tải dữ liệu...</p>
+                    ) : (
+                        <>
+                            <div className="accounttable">
+                                <TableContainer
+                                    component={Paper}
+                                    className="tablecontainer"
+                                >
+                                    {filteredRows.length === 0 && (
+                                        <div className="no-data-message">
+                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
+                                            <span className="no-mess">{search}</span>
+                                        </div>
+                                    )}
+                                    <Table
+                                        sx={{ minWidth: 650 }}
+                                        aria-label="simple table"
+                                    >
+                                        {filteredRows.length > 0 && (
+                                            <TableHead>
+                                                <TableRow>
+                                                    {/* <TableCell className="tableCell tabble-header">
+                                                        Họ tên
+                                                    </TableCell> */}
+                                                    <TableCell className="tableCell tabble-header">
+                                                        ID
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Tên tài khoản
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className="tableCell tabble-header"
+                                                        colSpan={2}
+                                                        align="center"
                                                     >
-                                                        <button className="updateBtn">
-                                                            Cập nhật
-                                                        </button>
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        {filteredRows.length > 0 && (
-                            <Pagination
-                                className="pagination"
-                                count={Math.ceil(filteredRows.length / rowsPerPage)}
-                                page={page}
-                                onChange={handleChangePage}
-                            />
-                        )}
-                    </div>
+                                                        Thao tác
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                        )}
+                                        <TableBody>
+                                            {filteredRows
+                                                .slice(
+                                                    (page - 1) * rowsPerPage,
+                                                    page * rowsPerPage
+                                                )
+                                                .map((account) => (
+                                                    <TableRow key={account.id}>
+                                                         <TableCell className="tableCell name-account">
+                                                            {account.id}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell name-account">
+                                                            {account.userName}
+                                                        </TableCell>
+                                                        {/* <TableCell className="tableCell user-account">
+                                                            {account.userAccount}
+                                                        </TableCell> */}
+                                                        <TableCell className="tableCell btn-action">
+                                                            <button
+                                                                className="deleteBtn btn"
+                                                                onClick={() =>
+                                                                    handleDelete(account.id)
+                                                                }
+                                                            >
+                                                                Xóa
+                                                            </button>
+                                                            <Link
+                                                                to={`/accounts/update-account/${account.id}`}
+                                                                className="btn"
+                                                            >
+                                                                <button className="updateBtn">
+                                                                    Cập nhật
+                                                                </button>
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                {filteredRows.length > 0 && (
+                                    <Pagination
+                                        className="pagination"
+                                        count={Math.ceil(
+                                            filteredRows.length / rowsPerPage
+                                        )}
+                                        page={page}
+                                        onChange={handleChangePage}
+                                    />
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

@@ -25,7 +25,6 @@ import DetailTeacher from "./pages/teachers/detailTeacher/DetailTeacher.jsx";
 import Account from "./pages/accounts/mainAccount/Account.jsx";
 import AddAccount from "./pages/accounts/addAccount/AddAccount.jsx";
 import UpdateAccount from "./pages/accounts/updateAccount/UpdateAccount.jsx";
-import DetailAccount from "./pages/accounts/detailAccount/DetailAccount.jsx";
 
 // import History
 import History from "./pages/historybooking/mainHistory/History.jsx";
@@ -49,7 +48,7 @@ const router = createBrowserRouter([
         element: <Room />,
     },
     {
-        path: "/rooms/rooms",
+        path: "/rooms/add-room",
         element: <AddRoom />,
     },
     {
@@ -108,20 +107,16 @@ const router = createBrowserRouter([
     {
         path: "/accounts/update-account/:accountId",
         element: <UpdateAccount />,
-    },
-    {
-        path: "/accounts/detail-account/:accountId",
-        element: <DetailAccount />,
-    },
+    },   
     // ACCOUNT END
 
     // HISTORY START
     {
-        path: "/historys",
+        path: "/histories",
         element: <History />,
     },   
     {
-        path: "/historys/detail-history/:historyId",
+        path: "/histories/detail-history/:historyId",
         element: <DetailHistory />,
     },
     // HISTORY END
