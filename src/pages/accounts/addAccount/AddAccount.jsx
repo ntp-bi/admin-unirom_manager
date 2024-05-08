@@ -12,8 +12,7 @@ import "./add-account.scss";
 const AddEvent = () => {
     const [newAccount, setNewAccount] = useState({
         userName: "",
-        password: "",
-        confirmPassword: "",
+        password: "",        
     });
 
     const handleAccountInputChange = (e) => {

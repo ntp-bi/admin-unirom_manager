@@ -1,15 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
 import * as api from "../../../components/api/ApiRoom";
+import * as typeApi from "../../../components/api/ApiTypeRoom";
 import "./detail-room.scss";
 
 const DetailRoom = () => {
     const { roomId } = useParams();
-    const [room, setRoom] = useState(null);
+    const [room, setRoom] = useState([]);
+    const [roomTypes, setRoomTypes] = useState([]);
+
+    // Tạo một hàm để tìm loại phòng dựa trên typeId
+    const findRoomType = (typeId) => {
+        // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
+        const roomType = roomTypes.find(
+            (type) => parseInt(type.typeId) === parseInt(typeId)
+        );
+
+        // Kiểm tra xem roomType có tồn tại không
+        if (roomType) {
+            return roomType.typeName; // Trả về tên của loại phòng nếu tồn tại
+        } else {
+            return "Unknown"; // Trả về "Unknown" nếu không tìm thấy loại phòng
+        }
+    };
+
+    useEffect(() => {
+        const fetchRoomTypes = async () => {
+            try {
+                const result = await typeApi.getAllType(); // Gọi API để lấy danh sách loại phòng
+                setRoomTypes(result); // Lưu trữ danh sách loại phòng vào state
+            } catch (error) {
+                toast.error(`Có lỗi: ${error.message}`);
+            }
+        };
+        fetchRoomTypes();
+    },[]);
 
     useEffect(() => {
         const fetchRoom = async () => {
@@ -63,7 +94,7 @@ const DetailRoom = () => {
                                         <label>
                                             Loại phòng:
                                             <span className="info type-room">
-                                                {room.roomType}
+                                                {findRoomType(room.typeId)}
                                             </span>
                                         </label>
                                     </div>

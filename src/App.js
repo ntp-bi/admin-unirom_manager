@@ -10,6 +10,11 @@ import AddRoom from "./pages/rooms/addRoom/AddRoom.jsx";
 import UpdateRoom from "./pages/rooms/updateRoom/UpdateRoom.jsx";
 import DetailRoom from "./pages/rooms/detailRoom/DetailRoom.jsx";
 
+// import Types Room
+import TypeRoom from "./pages/type-rooms/mainTypeRoom/TypeRoom.jsx";
+import AddTypeRoom from "./pages/type-rooms/addTypeRoom/AddTypeRoom.jsx";
+import UpdateTypeRoom from "./pages/type-rooms/updateTypeRoom/UpdateTypeRoom.jsx";
+
 // import Events
 import Event from "./pages/events/mainEvent/Event.jsx";
 import AddEvent from "./pages/events/addEvent/AddEvent.jsx";
@@ -60,6 +65,21 @@ const router = createBrowserRouter([
         element: <DetailRoom />,
     },
     // ROOMS END
+
+    // TYPE ROOM START
+    {
+        path: "/types",
+        element: <TypeRoom />,
+    },
+    {
+        path: "/types/add-type",
+        element: <AddTypeRoom />,
+    },
+    {
+        path: "/types/update-type/:typeId",
+        element: <UpdateTypeRoom />,
+    },
+    // TYPE ROOM END
 
     // EVENT START
     {

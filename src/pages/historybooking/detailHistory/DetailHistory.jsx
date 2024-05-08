@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import moment from 'moment';
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -12,19 +13,14 @@ import "./detail-history.scss";
 const DetailHistory = () => {
     const { historyId } = useParams();
     const [histories, setHistories] = useState(null);
-    const [status, setStatus] = useState([]);
 
-    useEffect(() => {
-        const fetchStatus = async () => {
-            try {
-                const statuses = await api.getAllHistory();
-                setStatus(statuses);
-            } catch (error) {
-                console.error("Error fetching room statuses:", error);
-            }
-        };
-        fetchStatus();
-    }, []);
+    const STATUS_LABELS = {
+        1: "Chờ xác nhận",
+        2: "Đã xác nhận",
+        3: "Trả phòng",
+        4: "Đã hủy",
+        5: "Từ chối",
+    };
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -38,22 +34,6 @@ const DetailHistory = () => {
 
         fetchHistory();
     }, [historyId]);
-
-    const handleChangeStatus = async (e) => {
-        const newStatus = e.target.value;
-        try {
-            await api.updateHistoryStatus(historyId, newStatus);
-            setHistories((prevHistories) => ({
-                ...prevHistories,
-                status: newStatus,
-            }));
-            toast.success(
-                `Trạng thái của lịch sử đặt phòng đã được cập nhật thành công!`
-            );
-        } catch (error) {
-            toast.error(`Có lỗi: ${error.message}`);
-        }
-    };
 
     // Hàm xử lý xóa sự kiện
     const handleDelete = async (historyId) => {
@@ -80,6 +60,35 @@ const DetailHistory = () => {
         }, 3000);
     };
 
+    const handleComplete = async (historyId) => {
+        // Hiển thị hộp thoại xác nhận
+        const confirmed = window.confirm(
+            "Bạn có chắc chắn muốn xác nhận hoàn thành lịch sử đặt phòng này không?"
+        );
+        if (confirmed) {
+            try {
+                const result = await api.completeHistory(historyId); // Gọi API xác nhận hoàn thành
+                if (result) {
+                    // Nếu kết quả trả về không rỗng (cập nhật thành công)
+                    toast.success(`Lịch sử đặt ${historyId} đã được hoàn thành!`);
+                    // Cập nhật state của histories với thông tin mới
+                    setHistories((prevHistories) => ({
+                        ...prevHistories,
+                        endTime: moment().format('DD-MM-YYYY HH:mm:ss') // Format the date
+                    }));
+                } else {
+                    // Nếu kết quả trả về rỗng (có lỗi xảy ra)
+                    toast.error(`Có lỗi khi xác nhận hoàn thành lịch sử đặt phòng.`);
+                }
+            } catch (error) {
+                toast.error(`Có lỗi: ${error.message}`);
+            }
+        }
+        setTimeout(() => {
+            toast.dismiss();
+        }, 3000);
+    };
+
     return (
         <div className="detailHitory">
             <Sidebar />
@@ -92,23 +101,14 @@ const DetailHistory = () => {
                     <div className="bottom">
                         <div className="right">
                             <div className="historry-action">
-                                <div className="formInput">
-                                    <select
-                                        className="select"
-                                        onChange={handleChangeStatus}
-                                        name="status"
-                                        value={histories.status}
-                                    >
-                                        <option>-- Xử lý trạng thái --</option>
-                                        {status.map((state) => (
-                                            <option key={state} value={state.status}>
-                                                {state.status}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
                                 <button
-                                    className="deleteBtn"
+                                    className="completeBtn btn"
+                                    onClick={() => handleComplete(histories.id)}
+                                >
+                                    Xác nhận hoàn thành
+                                </button>
+                                <button
+                                    className="deleteBtn btn"
                                     onClick={() => handleDelete(histories.id)}
                                 >
                                     Xóa
@@ -130,7 +130,7 @@ const DetailHistory = () => {
                                     <label>
                                         Trạng thái:
                                         <span className="info status">
-                                            {histories.status}
+                                            {STATUS_LABELS[histories.status]}
                                         </span>
                                     </label>
                                 </div>
@@ -159,7 +159,7 @@ const DetailHistory = () => {
                                         </span>
                                     </label>
                                 </div>
-                                
+
                                 <div className="formInput">
                                     <label>
                                         Thời gian trả phòng:

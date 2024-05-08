@@ -32,7 +32,7 @@ import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../../components/services/searchService";
 
-import * as api from "../../../components/api/ApiHistories"
+import * as api from "../../../components/api/ApiHistories";
 
 import "./main-history.scss";
 
@@ -40,7 +40,7 @@ dayjs.locale("vi"); // Set locale to Vietnamese
 
 const History = () => {
     const [histories, setHistories] = useState([]);
-    const [status, setStatus] = useState(0);
+    const [selectedStatus, setSelectedStatus] = useState({});
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
     const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
@@ -54,7 +54,36 @@ const History = () => {
 
     const inputRef = useRef();
 
-    const statuses = [...new Set(histories.map((history) => history.status))];
+    const STATUS_LABELS = {
+        1: "Chờ xác nhận",
+        2: "Đã xác nhận",
+        3: "Từ chối",
+        4: "Đã hủy",
+        5: "Trả phòng",
+    };
+
+    const getStatusClassName = (status) => {
+        switch (parseInt(status)) {
+            case 1:
+                return "pending";
+            case 2:
+                return "confirmed";
+            case 3:
+                return "cancelled";
+            case 4:
+                return "rejected";
+            case 5:
+                return "checked-in";
+            default:
+                return "";
+        }
+    };
+
+    const convertStatusToNumber = (status) => {
+        return parseInt(status);
+    };
+
+    const statuses = [...new Set(histories.map((history) => Math.abs(history.status)))];
 
     useEffect(() => {
         fetchHistories(); // Gọi hàm fetchHistories khi component được render
@@ -110,14 +139,14 @@ const History = () => {
 
     // Xử lý khi trạng thái thay đổi
     const handleStatusChange = (event) => {
-        const selectedStatus = parseInt(event.target.value); // Chuyển đổi giá trị sang kiểu number
-        setStatus(selectedStatus);
-        filterRows(selectedStatus, search, selectedDateRange);
+        const selectedStatusValue = convertStatusToNumber(event.target.value);
+        setSelectedStatus(selectedStatusValue); // Sửa status thành selectedStatus
+        filterRows(selectedStatusValue, search, selectedDateRange); // Sửa status thành selectedStatus
     };
 
     // Xử lý khi click vào button tìm kiếm
     const handleSearch = () => {
-        filterRows(status, search, selectedDateRange);
+        filterRows(selectedStatus, search, selectedDateRange);
     };
 
     const filterRows = (selectedStatus, searchTerm, dateRange) => {
@@ -148,7 +177,7 @@ const History = () => {
 
     const handleDateRangeChange = (newDateRange) => {
         setSelectedDateRange(newDateRange);
-        filterRows(status, search, newDateRange);
+        filterRows(selectedStatus, search, newDateRange);
     };
 
     return (
@@ -163,13 +192,13 @@ const History = () => {
                     <div className="historySearch">
                         <select
                             className="select"
-                            value={status}
+                            value={selectedStatus}
                             onChange={handleStatusChange}
                         >
                             <option value="">-- Chọn trạng thái --</option>
                             {statuses.map((status) => (
                                 <option key={status} value={status}>
-                                    {status}
+                                    {STATUS_LABELS[status]}
                                 </option>
                             ))}
                         </select>
@@ -235,9 +264,6 @@ const History = () => {
                                                         Họ tên
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
-                                                        Loại phòng
-                                                    </TableCell>
-                                                    <TableCell className="tableCell tabble-header">
                                                         Thời gian đặt
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
@@ -276,9 +302,6 @@ const History = () => {
                                                             {history.fullName}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {history.typeRoom}
-                                                        </TableCell>
-                                                        <TableCell className="tableCell">
                                                             {history.reserveTime}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
@@ -289,9 +312,15 @@ const History = () => {
                                                         </TableCell>
                                                         <TableCell className="tableCell">
                                                             <span
-                                                                className={`status ${history.status}`}
+                                                                className={`status ${getStatusClassName(
+                                                                    history.status
+                                                                )}`}
                                                             >
-                                                                {history.status}
+                                                                {
+                                                                    STATUS_LABELS[
+                                                                        history.status
+                                                                    ]
+                                                                }
                                                             </span>
                                                         </TableCell>
                                                         <TableCell className="tableCell btn-action">

@@ -24,27 +24,40 @@ const Report = () => {
     const [selectedYear, setSelectedYear] = useState("");
 
     const handleStatistics = async () => {
-        if (!selectedDay || !selectedMonth || !selectedYear) {
-            alert(
-                "Vui lòng chọn đầy đủ ngày, tháng và năm trước khi thực hiện thống kê."
-            );
+        if (!selectedYear) {
+            alert("Vui lòng chọn thông tin trước khi thực hiện thống kê.");
             return;
         }
-
+    
         // gọi hàm fetchReportsByDate từ API để lấy dữ liệu báo cáo dựa trên ngày, tháng và năm được chọn.
         const data = await fetchReportsByDate(selectedDay, selectedMonth, selectedYear);
-
+    
         if (data) {
             setReports(data);
-            //cập nhật state mostBookedRooms với thông tin về loại phòng được đặt nhiều nhất từ dữ liệu trả về.
-            setMostBookedRooms(data[0].theMostRoomTypeOfBooking);
-            setLeastBookedRooms(data[0].leastOfRoomTypeOfBooking);
+    
+            // Find the most and least booked rooms across all reports
+            let allMostBookedRooms = [];
+            let allLeastBookedRooms = [];
+    
+            data.forEach(report => {
+                allMostBookedRooms.push(...report.theMostRoomTypeOfBooking);
+                allLeastBookedRooms.push(...report.leastOfRoomTypeOfBooking);
+            });
+    
+            // Sort rooms by count in descending order
+            allMostBookedRooms.sort((a, b) => b.countOfBookingRoom - a.countOfBookingRoom);
+            allLeastBookedRooms.sort((a, b) => a.countOfBookingRoom - b.countOfBookingRoom);
+    
+            // Set most and least booked rooms
+            setMostBookedRooms(allMostBookedRooms);
+            setLeastBookedRooms(allLeastBookedRooms);
         } else {
             setReports([]);
             setMostBookedRooms([]);
             setLeastBookedRooms([]);
         }
     };
+    
 
     const handleDayChange = (event) => {
         setSelectedDay(event.target.value);
@@ -82,7 +95,7 @@ const Report = () => {
                             value={selectedDay}
                             onChange={handleDayChange}
                         >
-                            <option value="">Chọn ngày</option>
+                            <option value="">-- Chọn ngày --</option>
                             {days.map((day) => (
                                 <option key={day} value={day}>
                                     {day}
@@ -95,7 +108,7 @@ const Report = () => {
                             value={selectedMonth}
                             onChange={handleMonthChange}
                         >
-                            <option value="">Chọn tháng</option>
+                            <option value="">-- Chọn tháng --</option>
                             {months.map((month) => (
                                 <option key={month} value={month}>
                                     {month}
@@ -108,7 +121,7 @@ const Report = () => {
                             value={selectedYear}
                             onChange={handleYearChange}
                         >
-                            <option value="">Chọn năm</option>
+                            <option value="">-- Chọn năm --</option>
                             {years.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
@@ -132,6 +145,9 @@ const Report = () => {
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell className="tableCell tabble-header">
+                                                    Ngày
+                                                </TableCell>
+                                                <TableCell className="tableCell tabble-header">
                                                     Số lượng đặt phòng
                                                 </TableCell>
                                                 <TableCell className="tableCell tabble-header">
@@ -151,6 +167,9 @@ const Report = () => {
                                         <TableBody>
                                             {reports.map((report, index) => (
                                                 <TableRow key={index}>
+                                                    <TableCell className="tableCell">
+                                                        {`${report.day}/${report.month}/${report.year}`}
+                                                    </TableCell>
                                                     <TableCell className="tableCell">
                                                         {report.countOfBookingRoom}
                                                     </TableCell>

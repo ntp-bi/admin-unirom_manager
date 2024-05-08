@@ -43,6 +43,7 @@
                     gap: 30px;
                     justify-content: space-around;
                     position: relative;
+                    top: 10px;
 
                     .formInput {
                         width: 100%;
@@ -72,12 +73,15 @@
                 }
                 .btn-action {
                     .back {
-                        color: goldenrod;
-                        border: 1px dotted goldenrod;
-                        margin-right: 50px;
+                        color: #333;
+                        background-color: #F4F4F4;
+                        border: 1px dotted #bbbb;
+                        margin-right: 40px;
+                        transition: background-color 0.3s linear;
+                        margin-bottom: -10px;
 
                         &:hover {
-                            background-color: #e0e5ae;
+                            background-color: #e7e7e7;
                         }
                     }
                 }

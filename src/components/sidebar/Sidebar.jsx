@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Person3OutlinedIcon from "@mui/icons-material/Person3Outlined";
@@ -13,10 +14,11 @@ import { Link, useLocation, useParams } from "react-router-dom";
 const Sidebar = () => {
     const location = useLocation();
     const { roomId } = useParams();
-    const { historyId } = useParams();
-    const { teacherId } = useParams();
-    const { accountId } = useParams();
+    const { typeId } = useParams();
     const { eventId } = useParams();
+    const { accountId } = useParams();
+    const { teacherId } = useParams();
+    const { historyId } = useParams();
 
     const [closeMenu, setCloseMenu] = useState(false);
 
@@ -57,8 +59,23 @@ const Sidebar = () => {
                                     : ""
                             }
                         >
-                            <DoorSlidingOutlinedIcon className="icon" />
+                            <StorefrontIcon className="icon" />
                             <span>Phòng</span>
+                        </li>
+                    </Link>
+
+                    <Link to="/types" style={{ textDecoration: "none" }}>
+                        <li
+                            className={
+                                location.pathname === "/types" ||
+                                location.pathname === "/types/add-type" ||
+                                location.pathname === `/types/update-type/${typeId}`
+                                    ? "active"
+                                    : ""
+                            }
+                        >
+                            <DoorSlidingOutlinedIcon className="icon" />
+                            <span>Loại phòng</span>
                         </li>
                     </Link>
 

@@ -5,40 +5,40 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { getEventById, updateEvent } from "../../../components/api/ApiEvent";
+import { getTypeById, updateType } from "../../../components/api/ApiTypeRoom";
 
-const UpdateEvent = () => {
-    const { eventId } = useParams();
+const UpdateTypeRoom = () => {
+    const { typeId } = useParams();
 
-    const [event, setEvent] = useState({
-        eventName: "",
+    const [type, setType] = useState({
+        typeName: ""
     });
 
     useEffect(() => {
-        const fetchEvent = async () => {
+        const fetchType = async () => {
             try {
-                const eventData = await getEventById(eventId);
-                setEvent(eventData);
+                const typeData = await getTypeById(typeId);
+                setType(typeData);
             } catch (error) {
-                console.error("Error fetching event:", error);
+                console.error("Error fetching type:", error);
             }
         };
 
-        fetchEvent();
-    }, [eventId]);
+        fetchType();
+    }, [typeId]);
 
-    const handleEventInputChange = (e) => {
+    const handleTypeInputChange = (e) => {
         const { name, value } = e.target;
-        setEvent({ ...event, [name]: value });
+        setType({ ...type, [name]: value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("event Data to be updated:", event); // Xem dữ liệu phòng trước khi gửi đi
+        console.log("Type Data to be updated:", type); // Xem dữ liệu phòng trước khi gửi đi
 
         try {
-            const response = await updateEvent(eventId, event);
-            console.log("Update Event Response:", response); // Xem phản hồi từ server
+            const response = await updateType(typeId, type);
+            console.log("Update Type Response:", response); // Xem phản hồi từ server
             if (response.status === 200) {
                 toast.success("Cập nhật loại phòng thành công!");
             } else {
@@ -48,31 +48,32 @@ const UpdateEvent = () => {
             toast.error(error.message);
         }
     };
+
     return (
-        <div className="add__event">
+        <div className="add__type">
             <Sidebar />
             <div className="addContainer">
                 <Navbar />
                 <div className="top">
-                    <span>Cập nhật thông tin sự kiện</span>
+                    <span>Cập nhật thông tin loại phòng</span>
                 </div>
-                <div className="bottom">
+                <div className="bottom bottom-update">
                     <div className="right">
                         <form onSubmit={handleSubmit}>
                             <div className="formInput">
-                                <label>Tên sự kiện:</label>
+                                <label>Tên loại phòng:</label>
                                 <input
-                                    required
                                     type="text"
-                                    placeholder="Nhập tên sự kiện"
-                                    name="eventName"
-                                    value={event.eventName}
-                                    onChange={handleEventInputChange}
+                                    placeholder="Nhập tên loại phòng"
+                                    required
+                                    name="typeName"
+                                    value={type.typeName}
+                                    onChange={handleTypeInputChange}
                                 />
-                            </div>
+                            </div>                          
 
                             <div className="btn-action">
-                                <Link to="/events">
+                                <Link to="/types">
                                     <button className="back">Trở về</button>
                                 </Link>
                                 <button className="btn-add" type="submit">
@@ -87,4 +88,4 @@ const UpdateEvent = () => {
     );
 };
 
-export default UpdateEvent;
+export default UpdateTypeRoom;

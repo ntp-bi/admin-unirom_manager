@@ -21,10 +21,13 @@ import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import * as searchServices from "../../../components/services/searchService";
 import * as api from "../../../components/api/ApiRoom";
+import * as typeApi from "../../../components/api/ApiTypeRoom";
+
 import "./room.scss";
 
 const Room = () => {
     const [rooms, setRooms] = useState([]);
+    const [roomTypes, setRoomTypes] = useState([]);
     const [status, setStatus] = useState(0);
     const [search, setSearch] = useState("");
     const [roomType, setRoomType] = useState("");
@@ -41,11 +44,45 @@ const Room = () => {
     const inputRef = useRef(); // Tham chiếu đến input tìm kiếm
 
     // Lấy danh sách loại phòng và trạng thái từ dữ liệu thực tế
-    const roomTypes = [...new Set(rooms.map((room) => room.roomType))];
     const statuses = [...new Set(rooms.map((room) => room.status))];
+
+    const STATUS_LABELS = {
+        1: "Còn trống",
+        2: "Đã được đặt",
+        3: "Bị hỏng",
+    };
+
+    const getStatusClassName = (status) => {
+        switch (parseInt(status)) {
+            case 1:
+                return "Available";
+            case 2:
+                return "Booked";
+            case 3:
+                return "Broken";
+            default:
+                return "";
+        }
+    };
+
+    // Tạo một hàm để tìm loại phòng dựa trên typeId
+    const findRoomType = (typeId) => {
+        // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
+        const roomType = roomTypes.find(
+            (type) => parseInt(type.typeId) === parseInt(typeId)
+        );
+
+        // Kiểm tra xem roomType có tồn tại không
+        if (roomType) {
+            return roomType.typeName; // Trả về tên của loại phòng nếu tồn tại
+        } else {
+            return "Unknown"; // Trả về "Unknown" nếu không tìm thấy loại phòng
+        }
+    };
 
     useEffect(() => {
         fetchRooms(); // Gọi hàm fetchRooms khi component được render
+        fetchRoomTypes(); // Gọi hàm fetchRoomTypes khi component được render
     }, []);
 
     // Hàm gọi API để lấy danh sách phòng
@@ -59,6 +96,15 @@ const Room = () => {
             setDataLoaded(true);
         } catch (error) {
             setIsLoading(false);
+            toast.error(`Có lỗi: ${error.message}`);
+        }
+    };
+
+    const fetchRoomTypes = async () => {
+        try {
+            const result = await typeApi.getAllType(); // Gọi API để lấy danh sách loại phòng
+            setRoomTypes(result); // Lưu trữ danh sách loại phòng vào state
+        } catch (error) {
             toast.error(`Có lỗi: ${error.message}`);
         }
     };
@@ -121,18 +167,15 @@ const Room = () => {
         filterRows(roomType, selectedStatus, search);
     };
 
-    // Xử lý sự kiện khi người dùng click vào button tìm kiếm
     const handleSearch = () => {
         filterRows(roomType, status, search); // Lọc dữ liệu
     };
 
     // Hàm lọc dữ liệu
-    const filterRows = (selectedRoomType, selectedStatus, searchTerm) => {
+    const filterRows = (selectedRoomTypes, selectedStatus, searchTerm) => {
         const filteredRows = rooms.filter((room) => {
             const roomTypeMatch =
-                !selectedRoomType ||
-                room.roomType.toLowerCase() === selectedRoomType.toLowerCase();
-            // So sánh trực tiếp giá trị status với giá trị đã chọn
+                selectedRoomTypes.length === 0 || selectedRoomTypes.includes(room.typeId);
             const statusMatch = !selectedStatus || room.status === selectedStatus;
             const nameMatch =
                 !searchTerm ||
@@ -146,7 +189,6 @@ const Room = () => {
 
     // Hàm xử lý xóa phòng
     const handleDelete = async (roomId) => {
-        // Hiển thị hộp thoại xác nhận
         const confirmed = window.confirm("Bạn có chắc chắn muốn xóa phòng này không?");
         if (confirmed) {
             try {
@@ -167,7 +209,6 @@ const Room = () => {
             toast.dismiss();
         }, 3000);
         setPage(1);
-
     };
 
     return (
@@ -188,8 +229,8 @@ const Room = () => {
                         >
                             <option value="">-- Chọn loại phòng --</option>
                             {roomTypes.map((type) => (
-                                <option key={type} value={type}>
-                                    {type}
+                                <option key={type.id} value={type.typeId}>
+                                    {type.typeName}
                                 </option>
                             ))}
                         </select>
@@ -198,13 +239,20 @@ const Room = () => {
                             value={status}
                             onChange={handleStatusChange}
                         >
-                            <option value="">-- Chọn trạng thái --</option>
+                            <option className="option Empty" value="">
+                                -- Chọn trạng thái --
+                            </option>
                             {statuses.map((status) => (
-                                <option key={status} value={status}>
-                                    {status}
+                                <option
+                                    key={status}
+                                    className={`option ${status}`}
+                                    value={status}
+                                >
+                                    {STATUS_LABELS[status]}
                                 </option>
                             ))}
                         </select>
+
                         <div className="search">
                             <input
                                 ref={inputRef}
@@ -244,10 +292,7 @@ const Room = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                            <span className="no-mess">
-                                                {status || roomType || search}
-                                            </span>
+                                            Không tìm thấy kết quả tìm kiếm                                            
                                         </div>
                                     )}
                                     <Table
@@ -255,7 +300,7 @@ const Room = () => {
                                         aria-label="simple table"
                                     >
                                         {filteredRows.length > 0 && (
-                                            <TableHead >
+                                            <TableHead>
                                                 <TableRow>
                                                     <TableCell className="tableCell tabble-header">
                                                         Ảnh
@@ -290,7 +335,7 @@ const Room = () => {
                                                         <TableCell className="tableCell">
                                                             <div className="cellWrapper">
                                                                 <img
-                                                                    src={room.img}
+                                                                    src={room.img || "/assets/person/no-image.png"}
                                                                     alt=""
                                                                     className="image"
                                                                 />
@@ -300,14 +345,22 @@ const Room = () => {
                                                         <TableCell className="tableCell name-room">
                                                             {room.nameRoom}
                                                         </TableCell>
+
                                                         <TableCell className="tableCell type-room">
-                                                            {room.roomType}
+                                                            {findRoomType(room.typeId)}
                                                         </TableCell>
+
                                                         <TableCell className="tableCell">
-                                                            <span
-                                                                className={`status ${room.status}`}
+                                                        <span
+                                                                className={`status ${getStatusClassName(
+                                                                    room.status
+                                                                )}`}
                                                             >
-                                                                {room.status}
+                                                                {
+                                                                    STATUS_LABELS[
+                                                                        room.status
+                                                                    ]
+                                                                }
                                                             </span>
                                                         </TableCell>
                                                         <TableCell className="tableCell btn-action">

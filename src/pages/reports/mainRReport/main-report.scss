@@ -132,17 +132,7 @@
                     }
                 }
             }
-            .link {
-                // cursor: pointer;
-                // margin-left: 30px;
-                // background-color: #210876;
-                // color: #fff;
-                // height: 34px;
-                // display: flex;
-                // align-items: center;
-                // justify-content: center;
-                // width: 100px;
-
+            .link {         
                 color: green;
                 font-size: 16px;
                 font-weight: 400;
@@ -181,26 +171,7 @@
                     color: white;
                     padding: 5px 10px;
                     cursor: pointer;
-                }
-
-                .status {
-                    padding: 5px;
-                    border-radius: 5px;
-
-                    &.Đặt {
-                        color: crimson;
-                        background-color: rgb(246, 233, 233);
-                    }
-
-                    &.Trống {
-                        color: green;
-                        background-color: rgba(0, 128, 0, 0.15);
-                    }
-                    &.Hỏng {
-                        color: goldenrod;
-                        background-color: rgba(173, 188, 1, 0.29);
-                    }
-                }
+                }                
 
                 .btn + .btn {
                     margin-left: 10px;
@@ -220,37 +191,7 @@
                     &:hover {
                         background-color: #d2edf9;
                     }
-                }
-
-                .deleteBtn {
-                    padding: 4px 8px;
-                    border-radius: 5px;
-                    color: crimson;
-                    border: 1px dotted rgba(220, 20, 60, 0.6);
-                    cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
-                    transition: background-color 0.3s linear;
-
-                    &:hover {
-                        background-color: rgb(246, 233, 233);
-                    }
-                }
-
-                .detailBtn {
-                    padding: 4px 8px;
-                    border-radius: 5px;
-                    color: goldenrod;
-                    border: 1px dotted goldenrod;
-                    cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
-                    transition: background-color 0.3s linear;
-
-                    &:hover {
-                        background-color: #e0e5ae;
-                    }
-                }
+                }                
             }
 
             .name-room {

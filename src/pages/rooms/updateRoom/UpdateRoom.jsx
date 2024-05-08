@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { updateRoom, getRoomById, getAllRooms } from "../../../components/api/ApiRoom";
+import { updateRoom, getRoomById } from "../../../components/api/ApiRoom";
+import * as typeApi from "../../../components/api/ApiTypeRoom";
 
 const UpdateRoom = () => {
     const { roomId } = useParams();
@@ -13,7 +14,7 @@ const UpdateRoom = () => {
     const [room, setRoom] = useState({
         img: null,
         nameRoom: "",
-        roomType: "",
+        typeId: "", // Changed from roomType to typeId
         area: "",
         countOfSeat: "",
         description: "",
@@ -21,14 +22,15 @@ const UpdateRoom = () => {
 
     const [roomTypes, setRoomTypes] = useState([]);
     const [imagePreview, setImagePreview] = useState("");
+    const [selectedRoomTypeId, setSelectedRoomTypeId] = useState(""); // State mới để lưu trữ ID của loại phòng được chọn
 
     useEffect(() => {
         const fetchRoomTypes = async () => {
             try {
-                const types = await getAllRooms();
-                setRoomTypes(types);
+                const result = await typeApi.getAllType();
+                setRoomTypes(result);
             } catch (error) {
-                console.error("Error fetching room types:", error);
+                toast.error(`Có lỗi: ${error.message}`);
             }
         };
         fetchRoomTypes();
@@ -40,8 +42,9 @@ const UpdateRoom = () => {
                 const roomData = await getRoomById(roomId);
                 setRoom(roomData);
                 setImagePreview(roomData.img);
+                setSelectedRoomTypeId(roomData.typeId); // Set selected room type ID
             } catch (error) {
-                console.error("Error fetching room:", error);
+                console.error("Lỗi khi lấy thông tin phòng:", error);
             }
         };
 
@@ -50,33 +53,32 @@ const UpdateRoom = () => {
 
     const handleRoomInputChange = (e) => {
         const { name, value } = e.target;
-        setRoom({ ...room, [name]: value });
+        setRoom((prevRoom) => ({ ...prevRoom, [name]: value }));
+    };
+
+    const handleRoomTypeChange = (e) => {
+        const selectedRoomType = e.target.value;
+        setSelectedRoomTypeId(selectedRoomType);
+        setRoom((prevRoom) => ({ ...prevRoom, typeId: selectedRoomType })); // Cập nhật typeId trong state room với ID của loại phòng được chọn
     };
 
     const handleImageChange = (e) => {
         const selectedImage = e.target.files[0];
-        // Kiểm tra xem selectedImage có tồn tại không và có phải là đối tượng File không
         if (selectedImage instanceof File) {
-            // Tạo một đối tượng FileReader để đọc dữ liệu của tệp hình ảnh
             const reader = new FileReader();
             reader.onload = () => {
-                // Khi FileReader đọc xong, gán dữ liệu hình ảnh vào thuộc tính img của newRoom
                 setRoom((prevRoom) => ({ ...prevRoom, img: reader.result }));
-                // Hiển thị xem trước hình ảnh
                 setImagePreview(reader.result);
             };
-            // Bắt đầu đọc dữ liệu của tệp hình ảnh
             reader.readAsDataURL(selectedImage);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Room Data to be updated:", room); // Xem dữ liệu phòng trước khi gửi đi
 
         try {
             const response = await updateRoom(roomId, room);
-            console.log("Update Room Response:", response); // Xem phản hồi từ server
             if (response.status === 200) {
                 toast.success("Cập nhật phòng thành công!");
             } else {
@@ -105,7 +107,7 @@ const UpdateRoom = () => {
                                             ? imagePreview
                                             : "/assets/person/no-image.png"
                                     }
-                                    alt="Image Room"
+                                    alt="Hình ảnh phòng"
                                     className="image"
                                 />
 
@@ -127,24 +129,23 @@ const UpdateRoom = () => {
                                         type="text"
                                         placeholder="Nhập tên phòng"
                                         name="nameRoom"
-                                        id="nameRoom"
                                         value={room.nameRoom}
                                         onChange={handleRoomInputChange}
                                     />
                                 </div>
 
                                 <div className="formInput">
-                                    <label htmlFor="">Loại phòng: </label>
+                                    <label>Loại phòng: </label>
                                     <select
                                         className="select"
-                                        onChange={handleRoomInputChange}
+                                        onChange={handleRoomTypeChange}
                                         name="roomType"
-                                        value={room.roomType}
+                                        value={selectedRoomTypeId}
                                     >
                                         <option>-- Chọn loại phòng --</option>
                                         {roomTypes.map((type) => (
-                                            <option key={type.id} value={type.roomType}>
-                                                {type.roomType}
+                                            <option key={type.typeId} value={type.typeId}>
+                                                {type.typeName}
                                             </option>
                                         ))}
                                     </select>
@@ -156,7 +157,6 @@ const UpdateRoom = () => {
                                         type="number"
                                         placeholder="Nhập diện tích"
                                         name="area"
-                                        id="area"
                                         value={room.area}
                                         onChange={handleRoomInputChange}
                                     />
@@ -168,7 +168,6 @@ const UpdateRoom = () => {
                                         type="number"
                                         placeholder="Nhập số lượng chỗ ngồi"
                                         name="countOfSeat"
-                                        id="countOfSeat"
                                         value={room.countOfSeat}
                                         onChange={handleRoomInputChange}
                                     />
@@ -181,7 +180,6 @@ const UpdateRoom = () => {
                                         type="text"
                                         placeholder="Nhập mô tả"
                                         name="description"
-                                        id="description"
                                         value={room.description}
                                         onChange={handleRoomInputChange}
                                     />
@@ -189,7 +187,7 @@ const UpdateRoom = () => {
 
                                 <div className="btn-action">
                                     <Link to="/rooms">
-                                        <button className="back">Trở về</button>
+                                        <button className="back">Quay lại</button>
                                     </Link>
                                     <button className="btn-add" type="submit">
                                         Cập nhật

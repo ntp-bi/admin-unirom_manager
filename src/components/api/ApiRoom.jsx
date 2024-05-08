@@ -4,15 +4,24 @@ export const api = axios.create({
     baseURL: "https://66332f56f7d50bbd9b4872b3.mockapi.io",
 });
 
-export async function addRoom(img, nameRoom, roomType, area, countOfSeat, description) {
+export async function addRoom(
+    img,
+    nameRoom,
+    area,
+    countOfSeat,
+    description,
+    status,
+    typeId
+) {
     try {
         const response = await api.post("/rooms", {
             img,
             nameRoom,
-            roomType,
             area,
             countOfSeat,
             description,
+            status,
+            typeId,
         });
         return response.data;
     } catch (error) {
@@ -46,19 +55,19 @@ export async function updateRoom(
     roomId,
     img,
     nameRoom,
-    roomType,
     area,
     countOfSeat,
-    description
+    description,
+    typeId
 ) {
     const response = await api.put(
         `/rooms/${roomId}`,
         img,
         nameRoom,
-        roomType,
         area,
         countOfSeat,
-        description
+        description,
+        typeId
     );
     return response;
 }

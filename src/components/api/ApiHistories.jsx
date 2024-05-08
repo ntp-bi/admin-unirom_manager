@@ -31,11 +31,20 @@ export async function getHistoryById(historyId) {
     }
 }
 
-export async function updateHistoryStatus(historyId, newStatus) {
+export async function completeHistory(historyId) {
     try {
-        const result = await api.put(`/histories/${historyId}`, { status: newStatus });
+        const result = await api.put(`/histories/${historyId}`, { endTime: new Date() });
         return result.data;
     } catch (error) {
-        throw new Error(`Error updating history status: ${error.message}`);
+        throw new Error(`Error completing history: ${error.message}`);
     }
 }
+
+// export async function updateHistoryStatus(historyId, newStatus) {
+//     try {
+//         const result = await api.put(`/histories/${historyId}`, { status: newStatus });
+//         return result.data;
+//     } catch (error) {
+//         throw new Error(`Error updating history status: ${error.message}`);
+//     }
+// }

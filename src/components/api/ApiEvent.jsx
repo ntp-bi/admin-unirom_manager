@@ -32,16 +32,16 @@ export async function deleteEvent(eventId) {
     }
 }
 
-export async function updateEvent(eventId, eventData) {
+export async function updateEvent(eventId, eventName) {
     try {
-        const response = await api.put(`/events/${eventId}`, eventData);
-        return response.data;
+        const response = await api.put(`/events/${eventId}`, eventName);
+        return response;
     } catch (error) {
         throw new Error(`Có lỗi ${error.message}`);
     }
 }
 
-export async function geteventById(eventId) {
+export async function getEventById(eventId) {
     try {
         const result = await api.get(`/events/${eventId}`);
         return result.data;

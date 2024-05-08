@@ -4,8 +4,8 @@
 
     min-height: 100vh;
     border-right: 0.5px solid lightgray;
-    background-color: #222D32;
-    transition: 0.5s all ease-in;
+    background-color: #222d32;
+    transition: 0.5s all ease-in;  
 
     &.active {
         width: 3rem;
@@ -29,7 +29,7 @@
         height: 50px;
         align-items: center;
         justify-content: center;
-        background-color: #367FA9;
+        background-color: #367fa9;
 
         .logo {
             font-size: 20px;
@@ -71,7 +71,7 @@
 
                 &:hover {
                     // background-color: rgba($color: #dddd, $alpha: 1);
-                    background-color: #367FA9;
+                    background-color: #367fa9;
                     border-radius: 10px;
 
                     .icon {
@@ -90,7 +90,7 @@
                 }
 
                 &.active {
-                    background-color: #367FA9;
+                    background-color: #367fa9;
                     border-radius: 10px;
                     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 

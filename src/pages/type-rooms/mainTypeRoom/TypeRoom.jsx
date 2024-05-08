@@ -21,12 +21,12 @@ import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
 import * as searchServices from "../../../components/services/searchService";
-import * as api from "../../../components/api/ApiAccount";
+import * as api from "../../../components/api/ApiTypeRoom";
 
-import "./main-account.scss";
+import "./main-type.scss";
 
-const Account = () => {
-    const [account, setAccount] = useState([]);
+const TypeRoom = () => {
+    const [types, setTypes] = useState([]);
     const [search, setSearch] = useState("");
     const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
     const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
@@ -41,15 +41,15 @@ const Account = () => {
     const inputRef = useRef();
 
     useEffect(() => {
-        fetchRooms(); // Gọi hàm fetchRooms khi component được render
+        fetchTypeRooms(); // Gọi hàm fetchTypeRooms khi component được render
     }, []);
 
-    // Hàm gọi API để lấy danh sách sự kiện
-    const fetchRooms = async () => {
+    // Hàm gọi API để lấy danh sách loại phòng
+    const fetchTypeRooms = async () => {
         try {
             setIsLoading(true);
-            const result = await api.getAllAccount();
-            setAccount(result);
+            const result = await api.getAllType();
+            setTypes(result);
             setFilteredRows(result); // Cập nhật lại danh sách khi xóa
             setIsLoading(false);
             setDataLoaded(true);
@@ -87,7 +87,7 @@ const Account = () => {
     const handleClear = () => {
         setSearch("");
         inputRef.current.focus();
-        setFilteredRows(account);
+        setFilteredRows(types);
     };
 
     const handleSearchChange = (event) => {
@@ -106,30 +106,30 @@ const Account = () => {
     };
 
     const filterRows = (searchTerm) => {
-        const filteredRows = account.filter((account) => {
+        const filteredRows = types.filter((type) => {
             const nameMatch =
                 !searchTerm ||
-                account.userName.toLowerCase().includes(searchTerm.toLowerCase());
+                type.typeName.toLowerCase().includes(searchTerm.toLowerCase());
             return nameMatch;
         });
 
         setFilteredRows(filteredRows);
     };
 
-    // Hàm xử lý xóa sự kiện
-    const handleDelete = async (accountId) => {
+    // Hàm xử lý xóa loại phòng
+    const handleDelete = async (typeId) => {
         // Hiển thị hộp thoại xác nhận
-        const confirmed = window.confirm("Bạn có chắc chắn muốn xóa sự kiện này không?");
+        const confirmed = window.confirm("Bạn có chắc chắn muốn xóa loại phòng này không?");
         if (confirmed) {
             try {
-                const result = await api.deleteAccount(accountId); // Gọi API xóa sự kiện
+                const result = await api.deleteType(typeId); // Gọi API xóa loại phòng
                 if (result) {
-                    // Nếu kết quả trả về không rỗng (xóa sự kiện thành công)
-                    toast.success(`Tài khoản ${accountId} đã được xóa thành công!`);
-                    fetchRooms();
+                    // Nếu kết quả trả về không rỗng (xóa loại phòng thành công)
+                    toast.success(`Xóa phòng ${typeId} đã được xóa thành công!`);
+                    fetchTypeRooms();
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)
-                    toast.error(`Có lỗi khi xóa sự kiện.`);
+                    toast.error(`Có lỗi khi xóa loại phòng.`);
                 }
             } catch (error) {
                 toast.error(`Có lỗi: ${error.message}`);
@@ -143,21 +143,21 @@ const Account = () => {
     };
 
     return (
-        <div className="account">
+        <div className="type">
             <Sidebar />
-            <div className="accountContainer">
+            <div className="typeContainer">
                 <Navbar />
-                <div className="accountList">
+                <div className="typeList">
                     <div className="datatableTitle">
-                        <span>Quản lý tài khoản</span>
+                        <span>Quản lý loại phòng</span>
                     </div>
-                    <div className="accountSearch">
+                    <div className="typeSearch">
                         <h4>Tìm kiếm: </h4>
                         <div className="search">
                             <input
                                 ref={inputRef}
                                 spellCheck={false}
-                                placeholder="Nhập tên tài khoản muốn tìm."
+                                placeholder="Nhập tên loại phòng muốn tìm."
                                 value={search}
                                 onChange={handleSearchChange}
                             />
@@ -175,7 +175,7 @@ const Account = () => {
                             </button>
                         </div>
                         <Link
-                            to="/accounts/add-account"
+                            to="/types/add-type"
                             style={{ textDecoration: "none" }}
                             className="link"
                         >
@@ -203,12 +203,12 @@ const Account = () => {
                                     >
                                         {filteredRows.length > 0 && (
                                             <TableHead>
-                                                <TableRow>                                              
+                                                <TableRow>                                                    
                                                     <TableCell className="tableCell tabble-header">
                                                         ID
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
-                                                        Tên tài khoản
+                                                        Tên loại phòng
                                                     </TableCell>
                                                     <TableCell
                                                         className="tableCell tabble-header"
@@ -226,25 +226,25 @@ const Account = () => {
                                                     (page - 1) * rowsPerPage,
                                                     page * rowsPerPage
                                                 )
-                                                .map((account) => (
-                                                    <TableRow key={account.id}>
-                                                         <TableCell className="tableCell id-account">
-                                                            {account.id}
+                                                .map((type) => (
+                                                    <TableRow key={type.typeId}>
+                                                         <TableCell className="tableCell id-type">
+                                                            {type.typeId}
                                                         </TableCell>
-                                                        <TableCell className="tableCell name-account">
-                                                            {account.userName}
-                                                        </TableCell>
+                                                        <TableCell className="tableCell name-type">
+                                                            {type.typeName}
+                                                        </TableCell>                                                        
                                                         <TableCell className="tableCell btn-action">
                                                             <button
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
-                                                                    handleDelete(account.id)
+                                                                    handleDelete(type.typeId)
                                                                 }
                                                             >
                                                                 Xóa
                                                             </button>
                                                             <Link
-                                                                to={`/accounts/update-account/${account.id}`}
+                                                                to={`/types/update-type/${type.typeId}`}
                                                                 className="btn"
                                                             >
                                                                 <button className="updateBtn">
@@ -276,4 +276,4 @@ const Account = () => {
     );
 };
 
-export default Account;
+export default TypeRoom;
