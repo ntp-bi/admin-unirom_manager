@@ -17,7 +17,13 @@ const UpdateTeacher = () => {
         gentle: "",
         email: "",
     });
+
     const [imagePreview, setImagePreview] = useState("");
+
+    const [errors, setErrors] = useState({
+        fullName: "",
+        email: "",
+    });
 
     useEffect(() => {
         const fetchTeacher = async () => {
@@ -36,6 +42,10 @@ const UpdateTeacher = () => {
     const handleTeacherInputChange = (e) => {
         const { name, value } = e.target;
         setTeacher({ ...teacher, [name]: value });
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+        }));
     };
 
     const handleImageChange = (e) => {
@@ -57,11 +67,36 @@ const UpdateTeacher = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Teacher Data to be updated:", teacher); // Xem dữ liệu phòng trước khi gửi đi
+
+        let hasErrors = false;
+        const newErrors = { ...errors };
+
+        if (!teacher.fullName) {
+            newErrors.fullName = "Vui lòng nhập họ tên.";
+            hasErrors = true;
+        } else {
+            newErrors.fullName = "";
+        }
+
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        if (!teacher.email) {
+            newErrors.email = "Vui lòng nhập email.";
+            hasErrors = true;
+        } else if (!emailRegex.test(teacher.email)) {
+            newErrors.email = "Email không hợp lệ.";
+            hasErrors = true;
+        } else {
+            newErrors.email = "";
+        }
+
+        // Set error state và ngừng submit nếu có lỗi
+        if (hasErrors) {
+            setErrors(newErrors);
+            return;
+        }
 
         try {
             const response = await updateTeacher(teacherId, teacher);
-            console.log("Update Teacher Response:", response); // Xem phản hồi từ server
             if (response.status === 200) {
                 toast.success("Cập nhật thông tin giáo viên thành công!");
             } else {
@@ -71,6 +106,14 @@ const UpdateTeacher = () => {
             toast.error(error.message);
         }
     };
+
+    const handleInputFocus = (fieldName) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: "",
+        }));
+    };
+
 
     return (
         <div className="addTeacher">
@@ -93,7 +136,7 @@ const UpdateTeacher = () => {
                                 className="image"
                             />
                             <div className="formInput input-image">
-                                <input                                  
+                                <input
                                     id="img"
                                     name="img"
                                     type="file"
@@ -111,7 +154,12 @@ const UpdateTeacher = () => {
                                     name="fullName"
                                     value={teacher.fullName}
                                     onChange={handleTeacherInputChange}
+                                    onFocus={() => handleInputFocus("fullName")}
                                 />
+
+                                {errors.fullName && (
+                                    <div className="error">{errors.fullName}</div>
+                                )}
                             </div>
 
                             <div className="formInput radio">
@@ -154,16 +202,20 @@ const UpdateTeacher = () => {
                                     value={teacher.email}
                                     name="email"
                                     onChange={handleTeacherInputChange}
+                                    onFocus={() => handleInputFocus("email")}
                                 />
+                                {errors.email && (
+                                    <div className="error">{errors.email}</div>
+                                )}
                             </div>
 
                             <div className="btn-action">
-                                <Link to="/teachers">
-                                    <button className="back">Trở về</button>
-                                </Link>
                                 <button className="btn-add" type="submit">
                                     Cập nhật
                                 </button>
+                                <Link to="/teachers">
+                                    <button className="back">Trở về</button>
+                                </Link>
                             </div>
                         </div>
                     </form>

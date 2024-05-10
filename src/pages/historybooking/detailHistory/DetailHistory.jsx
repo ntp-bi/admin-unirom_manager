@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import moment from 'moment';
+import moment from "moment";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -12,7 +12,9 @@ import "./detail-history.scss";
 
 const DetailHistory = () => {
     const { historyId } = useParams();
-    const [histories, setHistories] = useState(null);
+    const [histories, setHistories] = useState([]);
+    const [isCompleteBtnVisible, setCompleteBtnVisible] = useState(true); // State để kiểm soát việc hiển thị của nút "Xác nhận hoàn thành"
+    const navigate = useNavigate();
 
     const STATUS_LABELS = {
         1: "Chờ xác nhận",
@@ -47,6 +49,7 @@ const DetailHistory = () => {
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa lịch sử đặt phòng thành công)
                     toast.success(`Lịch sử đặt ${historyId} đã được xóa thành công!`);
+                    navigate("/histories");
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)
                     toast.error(`Có lỗi khi xóa lịch sử đặt phòng.`);
@@ -74,8 +77,10 @@ const DetailHistory = () => {
                     // Cập nhật state của histories với thông tin mới
                     setHistories((prevHistories) => ({
                         ...prevHistories,
-                        endTime: moment().format('DD-MM-YYYY HH:mm:ss') // Format the date
+                        endTime: moment().format("DD-MM-YYYY HH:mm:ss"), // Format the date
                     }));
+                    // Ẩn nút "Xác nhận hoàn thành" sau khi đã hoàn thành
+                    setCompleteBtnVisible(false);
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)
                     toast.error(`Có lỗi khi xác nhận hoàn thành lịch sử đặt phòng.`);
@@ -101,12 +106,14 @@ const DetailHistory = () => {
                     <div className="bottom">
                         <div className="right">
                             <div className="historry-action">
-                                <button
-                                    className="completeBtn btn"
-                                    onClick={() => handleComplete(histories.id)}
-                                >
-                                    Xác nhận hoàn thành
-                                </button>
+                                {isCompleteBtnVisible && (
+                                    <button
+                                        className="completeBtn btn"
+                                        onClick={() => handleComplete(histories.id)}
+                                    >
+                                        Xác nhận hoàn thành
+                                    </button>
+                                )}
                                 <button
                                     className="deleteBtn btn"
                                     onClick={() => handleDelete(histories.id)}
@@ -118,6 +125,14 @@ const DetailHistory = () => {
                                 </Link>
                             </div>
                             <form>
+                                <div className="formInput">
+                                    <label>
+                                        Ảnh:
+                                        <span className="info name">
+                                            <img src={histories.photo} alt="" />
+                                        </span>
+                                    </label>
+                                </div>
                                 <div className="formInput">
                                     <label>
                                         Họ tên:
@@ -155,7 +170,7 @@ const DetailHistory = () => {
                                     <label htmlFor="">
                                         Loại phòng:
                                         <span className="info type-room">
-                                            {histories.typeRoom}
+                                            {histories.typeName}
                                         </span>
                                     </label>
                                 </div>

@@ -193,8 +193,7 @@ const TypeRoom = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                            <span className="no-mess">{search}</span>
+                                            Không tìm thấy kết quả tìm kiếm
                                         </div>
                                     )}
                                     <Table

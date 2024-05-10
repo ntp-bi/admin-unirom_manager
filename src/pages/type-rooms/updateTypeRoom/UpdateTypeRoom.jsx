@@ -11,7 +11,11 @@ const UpdateTypeRoom = () => {
     const { typeId } = useParams();
 
     const [type, setType] = useState({
-        typeName: ""
+        typeName: "",
+    });
+
+    const [errors, setErrors] = useState({
+        typeName: "",
     });
 
     useEffect(() => {
@@ -30,15 +34,33 @@ const UpdateTypeRoom = () => {
     const handleTypeInputChange = (e) => {
         const { name, value } = e.target;
         setType({ ...type, [name]: value });
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Type Data to be updated:", type); // Xem dữ liệu phòng trước khi gửi đi
+
+        let hasErrors = false;
+        const newErrors = { ...errors };
+
+        if (!type.typeName) {
+            newErrors.typeName = "Vui lòng nhập tên phòng.";
+            hasErrors = true;
+        } else {
+            newErrors.typeName = "";
+        }
+
+        if (hasErrors) {
+            setErrors(newErrors);
+            return;
+        }
 
         try {
             const response = await updateType(typeId, type);
-            console.log("Update Type Response:", response); // Xem phản hồi từ server
+
             if (response.status === 200) {
                 toast.success("Cập nhật loại phòng thành công!");
             } else {
@@ -47,6 +69,13 @@ const UpdateTypeRoom = () => {
         } catch (error) {
             toast.error(error.message);
         }
+    };
+
+    const handleInputFocus = (fieldName) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: "",
+        }));
     };
 
     return (
@@ -65,12 +94,15 @@ const UpdateTypeRoom = () => {
                                 <input
                                     type="text"
                                     placeholder="Nhập tên loại phòng"
-                                    required
                                     name="typeName"
                                     value={type.typeName}
                                     onChange={handleTypeInputChange}
+                                    onFocus={() => handleInputFocus("typeName")}
                                 />
-                            </div>                          
+                                {errors.typeName && (
+                                    <div className="error">{errors.typeName}</div>
+                                )}
+                            </div>
 
                             <div className="btn-action">
                                 <Link to="/types">

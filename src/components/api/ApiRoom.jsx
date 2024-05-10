@@ -11,7 +11,8 @@ export async function addRoom(
     countOfSeat,
     description,
     status,
-    typeId
+    typeId,
+    typeName
 ) {
     try {
         const response = await api.post("/rooms", {
@@ -22,6 +23,7 @@ export async function addRoom(
             description,
             status,
             typeId,
+            typeName,
         });
         return response.data;
     } catch (error) {
@@ -58,7 +60,8 @@ export async function updateRoom(
     area,
     countOfSeat,
     description,
-    typeId
+    typeId,
+    typeName
 ) {
     const response = await api.put(
         `/rooms/${roomId}`,
@@ -67,7 +70,8 @@ export async function updateRoom(
         area,
         countOfSeat,
         description,
-        typeId
+        typeId,
+        typeName
     );
     return response;
 }

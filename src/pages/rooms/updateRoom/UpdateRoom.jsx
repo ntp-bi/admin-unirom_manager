@@ -14,15 +14,20 @@ const UpdateRoom = () => {
     const [room, setRoom] = useState({
         img: null,
         nameRoom: "",
-        typeId: "", // Changed from roomType to typeId
         area: "",
         countOfSeat: "",
         description: "",
+        typeId: "",
+        typeName: "",
+    });
+
+    const [errors, setErrors] = useState({
+        area: "",
+        countOfSeat: "",
     });
 
     const [roomTypes, setRoomTypes] = useState([]);
     const [imagePreview, setImagePreview] = useState("");
-    const [selectedRoomTypeId, setSelectedRoomTypeId] = useState(""); // State mới để lưu trữ ID của loại phòng được chọn
 
     useEffect(() => {
         const fetchRoomTypes = async () => {
@@ -42,7 +47,6 @@ const UpdateRoom = () => {
                 const roomData = await getRoomById(roomId);
                 setRoom(roomData);
                 setImagePreview(roomData.img);
-                setSelectedRoomTypeId(roomData.typeId); // Set selected room type ID
             } catch (error) {
                 console.error("Lỗi khi lấy thông tin phòng:", error);
             }
@@ -58,8 +62,21 @@ const UpdateRoom = () => {
 
     const handleRoomTypeChange = (e) => {
         const selectedRoomType = e.target.value;
-        setSelectedRoomTypeId(selectedRoomType);
-        setRoom((prevRoom) => ({ ...prevRoom, typeId: selectedRoomType })); // Cập nhật typeId trong state room với ID của loại phòng được chọn
+        // tìm phần tử trong mảng roomTypes mà có thuộc tính typeId bằng với giá trị của selectedRoomType
+        const selectedType = roomTypes.find((type) => type.typeName === selectedRoomType);
+
+        if (selectedType) {
+            setRoom({
+                ...room,
+                typeId: selectedType.typeId,
+                typeName: selectedRoomType,
+            });
+
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                roomType: "",
+            }));
+        }
     };
 
     const handleImageChange = (e) => {
@@ -77,6 +94,28 @@ const UpdateRoom = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        let hasErrors = false;
+        const newErrors = { ...errors };
+
+        if (room.area <= 0) {
+            newErrors.area = "Diện tích phòng phải lớn hơn 0.";
+            hasErrors = true;
+        } else {
+            newErrors.area = "";
+        }
+
+        if (room.countOfSeat <= 0) {
+            newErrors.countOfSeat = "Số lượng chỗ ngồi phải lớn hơn 0.";
+            hasErrors = true;
+        } else {
+            newErrors.countOfSeat = "";
+        }
+
+        if (hasErrors) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
             const response = await updateRoom(roomId, room);
             if (response.status === 200) {
@@ -87,6 +126,13 @@ const UpdateRoom = () => {
         } catch (error) {
             toast.error(error.message);
         }
+    };
+
+    const handleInputFocus = (fieldName) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: "",
+        }));
     };
 
     return (
@@ -125,7 +171,6 @@ const UpdateRoom = () => {
                                 <div className="formInput">
                                     <label>Tên phòng:</label>
                                     <input
-                                        required
                                         type="text"
                                         placeholder="Nhập tên phòng"
                                         name="nameRoom"
@@ -139,12 +184,15 @@ const UpdateRoom = () => {
                                     <select
                                         className="select"
                                         onChange={handleRoomTypeChange}
-                                        name="roomType"
-                                        value={selectedRoomTypeId}
+                                        name="typeName"
+                                        value={room.typeName}
                                     >
                                         <option>-- Chọn loại phòng --</option>
                                         {roomTypes.map((type) => (
-                                            <option key={type.typeId} value={type.typeId}>
+                                            <option
+                                                key={type.typeId}
+                                                value={type.typeName}
+                                            >
                                                 {type.typeName}
                                             </option>
                                         ))}
@@ -153,29 +201,34 @@ const UpdateRoom = () => {
                                 <div className="formInput">
                                     <label>Diện tích:</label>
                                     <input
-                                        required
                                         type="number"
                                         placeholder="Nhập diện tích"
                                         name="area"
                                         value={room.area}
                                         onChange={handleRoomInputChange}
+                                        onFocus={() => handleInputFocus("area")}
                                     />
+                                    {errors.area && (
+                                        <div className="error">{errors.area}</div>
+                                    )}
                                 </div>
                                 <div className="formInput">
                                     <label>Số lượng chỗ ngồi:</label>
                                     <input
-                                        required
                                         type="number"
                                         placeholder="Nhập số lượng chỗ ngồi"
                                         name="countOfSeat"
                                         value={room.countOfSeat}
                                         onChange={handleRoomInputChange}
+                                        onFocus={() => handleInputFocus("countOfSeat")}
                                     />
+                                    {errors.countOfSeat && (
+                                        <div className="error">{errors.countOfSeat}</div>
+                                    )}
                                 </div>
                                 <div className="formArea">
                                     <label>Mô tả:</label>
                                     <textarea
-                                        required
                                         className="desc"
                                         type="text"
                                         placeholder="Nhập mô tả"
@@ -186,12 +239,12 @@ const UpdateRoom = () => {
                                 </div>
 
                                 <div className="btn-action">
-                                    <Link to="/rooms">
-                                        <button className="back">Quay lại</button>
-                                    </Link>
                                     <button className="btn-add" type="submit">
                                         Cập nhật
                                     </button>
+                                    <Link to="/rooms">
+                                        <button className="back">Quay lại</button>
+                                    </Link>
                                 </div>
                             </div>
                         </form>

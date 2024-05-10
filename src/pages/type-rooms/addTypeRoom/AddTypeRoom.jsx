@@ -11,26 +11,55 @@ import "./add-type.scss";
 
 const AddTypeRoom = () => {
     const [newType, setNewType] = useState({
-        typeName: ""
+        typeName: "",
+    });
+
+    const [errors, setErrors] = useState({
+        typeName: "",
     });
 
     const handleTypeInputChange = (e) => {
         const { name, value } = e.target;
         setNewType({ ...newType, [name]: value });
+        
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let hasErrors = false;
+        const newErrors = { ...errors };
+
+        if (!newType.typeName) {
+            newErrors.typeName = "Vui lòng nhập tên phòng.";
+            hasErrors = true;
+        } else {
+            newErrors.typeName = "";
+        }
+
+        if (hasErrors) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            await addType(
-                newType.typeName
-            );
+            await addType(newType.typeName);
             toast.success("Loại phòng đã được thêm thành công!");
-            setNewType({ typeName: ""});
+            setNewType({ typeName: "" });
         } catch (error) {
             toast.error("Có lỗi xảy ra khi thêm loại phòng!");
             console.error("Error adding Type:", error);
         }
+    };
+
+    const handleInputFocus = (fieldName) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: "",
+        }));
     };
 
     return (
@@ -49,20 +78,23 @@ const AddTypeRoom = () => {
                                 <input
                                     type="text"
                                     placeholder="Nhập tên loại phòng"
-                                    required
                                     name="typeName"
                                     value={newType.typeName}
                                     onChange={handleTypeInputChange}
+                                    onFocus={() => handleInputFocus("typeName")}
                                 />
-                            </div>                                               
+                                {errors.typeName && (
+                                    <div className="error">{errors.typeName}</div>
+                                )}
+                            </div>
 
                             <div className="btn-action">
-                                <Link to="/types">
-                                    <button className="back">Trở về</button>
-                                </Link>
                                 <button className="btn-add" type="submit">
                                     Thêm
                                 </button>
+                                <Link to="/types">
+                                    <button className="back">Trở về</button>
+                                </Link>
                             </div>
                         </form>
                     </div>

@@ -21,7 +21,7 @@ import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
 import * as searchServices from "../../../components/services/searchService";
-import * as api from "../../../components/api/ApiAccount";
+import * as api from "../../../components/api/ApiAccount"
 
 import "./main-account.scss";
 
@@ -193,8 +193,7 @@ const Account = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                            <span className="no-mess">{search}</span>
+                                            Không tìm thấy kết quả tìm kiếm.
                                         </div>
                                     )}
                                     <Table
@@ -209,6 +208,9 @@ const Account = () => {
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
                                                         Tên tài khoản
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
+                                                        Họ tên
                                                     </TableCell>
                                                     <TableCell
                                                         className="tableCell tabble-header"
@@ -227,24 +229,27 @@ const Account = () => {
                                                     page * rowsPerPage
                                                 )
                                                 .map((account) => (
-                                                    <TableRow key={account.id}>
+                                                    <TableRow key={account.accountId}>
                                                          <TableCell className="tableCell id-account">
-                                                            {account.id}
+                                                            {account.accountId}
                                                         </TableCell>
                                                         <TableCell className="tableCell name-account">
                                                             {account.userName}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell name-account">
+                                                            {account.fullName}
                                                         </TableCell>
                                                         <TableCell className="tableCell btn-action">
                                                             <button
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
-                                                                    handleDelete(account.id)
+                                                                    handleDelete(account.accountId)
                                                                 }
                                                             >
                                                                 Xóa
                                                             </button>
                                                             <Link
-                                                                to={`/accounts/update-account/${account.id}`}
+                                                                to={`/accounts/update-account/${account.accountId}`}
                                                                 className="btn"
                                                             >
                                                                 <button className="updateBtn">

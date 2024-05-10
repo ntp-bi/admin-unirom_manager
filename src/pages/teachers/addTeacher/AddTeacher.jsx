@@ -9,18 +9,29 @@ import { addTeacher } from "../../../components/api/ApiTeacher";
 import "./add-teacher.scss";
 
 const AddTeacher = () => {
+    const defaultBirthday = "2000-01-01";
+
     const [newTeacher, setNewTeacher] = useState({
         fullName: "",
-        birthday: "",
+        birthday: defaultBirthday,
         img: null,
-        gentle: "",
+        gentle: "Nam",
         email: "",
     });
     const [imagePreview, setImagePreview] = useState("");
 
+    const [errors, setErrors] = useState({
+        fullName: "",       
+        email: "",
+    });    
+
     const handleTeacherInputChange = (e) => {
         const { name, value } = e.target;
         setNewTeacher({ ...newTeacher, [name]: value });
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+        }));
     };
 
     const handleImageChange = (e) => {
@@ -42,6 +53,34 @@ const AddTeacher = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let hasErrors = false;
+        const newErrors = { ...errors };
+
+        if (!newTeacher.fullName) {
+            newErrors.fullName = "Vui lòng nhập họ tên.";
+            hasErrors = true;
+        } else {
+            newErrors.fullName = "";
+        }       
+
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        if (!newTeacher.email) {
+            newErrors.email = "Vui lòng nhập email.";
+            hasErrors = true;
+        } else if (!emailRegex.test(newTeacher.email)) {
+            newErrors.email = "Email không hợp lệ.";
+            hasErrors = true;
+        } else {
+            newErrors.email = "";
+        }
+
+        // Set error state và ngừng submit nếu có lỗi
+        if (hasErrors) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
             await addTeacher(
                 newTeacher.fullName,
@@ -62,6 +101,13 @@ const AddTeacher = () => {
         } catch (error) {
             toast.error(error.message);
         }
+    };
+
+    const handleInputFocus = (fieldName) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: "",
+        }));
     };
 
     return (
@@ -86,7 +132,6 @@ const AddTeacher = () => {
                             />
                             <div className="formInput input-image">
                                 <input
-                                    required
                                     id="img"
                                     name="img"
                                     type="file"
@@ -99,13 +144,16 @@ const AddTeacher = () => {
                             <div className="formInput">
                                 <label>Họ tên:</label>
                                 <input
-                                    required
                                     type="text"
                                     placeholder="Nhập họ tên"
                                     name="fullName"
                                     value={newTeacher.fullName}
                                     onChange={handleTeacherInputChange}
+                                    onFocus={() => handleInputFocus("fullName")}
                                 />
+                                {errors.fullName && (
+                                    <div className="error">{errors.fullName}</div>
+                                )}
                             </div>
 
                             <div className="formInput radio">
@@ -133,13 +181,15 @@ const AddTeacher = () => {
                             <div className="formInput">
                                 <label>Ngày sinh:</label>
                                 <input
-                                    required
                                     type="date"
                                     placeholder=""
                                     value={newTeacher.birthday}
                                     name="birthday"
                                     onChange={handleTeacherInputChange}
                                 />
+                                {errors.birthday && (
+                                    <div className="error">{errors.birthday}</div>
+                                )}
                             </div>
                             <div className="formInput email">
                                 <label>Email:</label>
@@ -149,16 +199,20 @@ const AddTeacher = () => {
                                     value={newTeacher.email}
                                     name="email"
                                     onChange={handleTeacherInputChange}
+                                    onFocus={() => handleInputFocus("email")}
                                 />
+                                {errors.email && (
+                                    <div className="error">{errors.email}</div>
+                                )}
                             </div>
 
                             <div className="btn-action">
-                                <Link to="/teachers">
-                                    <button className="back">Trở về</button>
-                                </Link>
                                 <button className="btn-add" type="submit">
                                     Thêm
                                 </button>
+                                <Link to="/teachers">
+                                    <button className="back">Trở về</button>
+                                </Link>
                             </div>
                         </div>
                     </form>

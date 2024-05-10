@@ -30,33 +30,27 @@ const Report = () => {
         }
     
         // gọi hàm fetchReportsByDate từ API để lấy dữ liệu báo cáo dựa trên ngày, tháng và năm được chọn.
-        const data = await fetchReportsByDate(selectedDay, selectedMonth, selectedYear);
+        const response = await fetchReportsByDate(selectedDay, selectedMonth, selectedYear);
+        const data = response.data;
     
         if (data) {
-            setReports(data);
+            // Xử lý dữ liệu thống kê
+            setReports([data]);
     
-            // Find the most and least booked rooms across all reports
-            let allMostBookedRooms = [];
-            let allLeastBookedRooms = [];
+            // Xử lý phòng được đặt nhiều nhất
+            const mostBookedRooms = data.theMostRoomTypeOfBooking;
+            setMostBookedRooms(mostBookedRooms);
     
-            data.forEach(report => {
-                allMostBookedRooms.push(...report.theMostRoomTypeOfBooking);
-                allLeastBookedRooms.push(...report.leastOfRoomTypeOfBooking);
-            });
-    
-            // Sort rooms by count in descending order
-            allMostBookedRooms.sort((a, b) => b.countOfBookingRoom - a.countOfBookingRoom);
-            allLeastBookedRooms.sort((a, b) => a.countOfBookingRoom - b.countOfBookingRoom);
-    
-            // Set most and least booked rooms
-            setMostBookedRooms(allMostBookedRooms);
-            setLeastBookedRooms(allLeastBookedRooms);
+            // Xử lý phòng được đặt ít nhất
+            const leastBookedRooms = data.leastOfRoomTypeOfBooking;
+            setLeastBookedRooms(leastBookedRooms);
         } else {
             setReports([]);
             setMostBookedRooms([]);
             setLeastBookedRooms([]);
         }
     };
+    
     
 
     const handleDayChange = (event) => {

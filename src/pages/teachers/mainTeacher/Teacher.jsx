@@ -189,8 +189,7 @@ const Teacher = () => {
                             <div className="top">
                                 {filteredRows.length === 0 && (
                                     <div className="no-data-message">
-                                        Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                        <span className="no-mess">{search}</span>
+                                        Không tìm thấy kết quả tìm kiếm.                                        
                                     </div>
                                 )}
                                 {filteredRows
@@ -223,7 +222,7 @@ const Teacher = () => {
 
                                             <div className="item">
                                                 <img
-                                                    src={teacher.img}
+                                                    src={teacher.img || "/assets/person/no-image.png"}
                                                     alt=""
                                                     className="itemImg"
                                                 />

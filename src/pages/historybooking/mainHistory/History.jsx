@@ -57,9 +57,9 @@ const History = () => {
     const STATUS_LABELS = {
         1: "Chờ xác nhận",
         2: "Đã xác nhận",
-        3: "Từ chối",
+        3: "Trả phòng",
         4: "Đã hủy",
-        5: "Trả phòng",
+        5: "Từ chối",
     };
 
     const getStatusClassName = (status) => {
@@ -69,11 +69,11 @@ const History = () => {
             case 2:
                 return "confirmed";
             case 3:
-                return "cancelled";
-            case 4:
-                return "rejected";
-            case 5:
                 return "checked-in";
+            case 4:
+                return "cancelled";
+            case 5:
+                return "rejected";
             default:
                 return "";
         }
@@ -270,6 +270,9 @@ const History = () => {
                                                         Thời gian trả
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
+                                                        Thời gian chấp nhận
+                                                    </TableCell>
+                                                    <TableCell className="tableCell tabble-header">
                                                         Thời gian kết thúc
                                                     </TableCell>
                                                     <TableCell className="tableCell tabble-header">
@@ -306,6 +309,9 @@ const History = () => {
                                                         </TableCell>
                                                         <TableCell className="tableCell">
                                                             {history.returnTime}
+                                                        </TableCell>
+                                                        <TableCell className="tableCell">
+                                                            {history.acceptTime}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
                                                             {history.endTime}

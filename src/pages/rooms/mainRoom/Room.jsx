@@ -228,7 +228,7 @@ const Room = () => {
                             onChange={handleRoomTypeChange}
                         >
                             <option value="">-- Chọn loại phòng --</option>
-                            {roomTypes.map((type) => (
+                            {rooms.map((type) => (
                                 <option key={type.id} value={type.typeId}>
                                     {type.typeName}
                                 </option>
@@ -347,7 +347,7 @@ const Room = () => {
                                                         </TableCell>
 
                                                         <TableCell className="tableCell type-room">
-                                                            {findRoomType(room.typeId)}
+                                                            {findRoomType(room.typeId)}                                                  
                                                         </TableCell>
 
                                                         <TableCell className="tableCell">

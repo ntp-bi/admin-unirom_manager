@@ -1,13 +1,13 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "https://66359f0e415f4e1a5e24f92a.mockapi.io",
+    baseURL: "http://localhost:8080/room/admin",
 });
 
 export async function getAllHistory() {
     try {
-        const result = await api.get("/histories");
-        return result.data;
+        const result = await api.get("BookingHistory/Search");
+        return result.data.data;
     } catch (error) {
         throw new Error("Error fetching history");
     }
@@ -15,8 +15,8 @@ export async function getAllHistory() {
 
 export async function deleteHistory(historyId) {
     try {
-        const result = await api.delete(`/histories/${historyId}`);
-        return result.data;
+        const result = await api.delete(`/BookingHistory/Delete/${historyId}`);
+        return result.data.data;
     } catch (error) {
         throw new Error(`Có lỗi ${error.message}`);
     }
@@ -24,8 +24,8 @@ export async function deleteHistory(historyId) {
 
 export async function getHistoryById(historyId) {
     try {
-        const result = await api.get(`/histories/${historyId}`);
-        return result.data;
+        const result = await api.get(`/BookingHistory/Detail/${historyId}`);
+        return result.data.data;
     } catch (error) {
         throw new Error(`Error fetching history ${error.message}`);
     }

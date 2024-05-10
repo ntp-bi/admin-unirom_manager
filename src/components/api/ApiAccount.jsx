@@ -4,11 +4,13 @@ export const api = axios.create({
     baseURL: "https://663520f39bb0df2359a3e3f0.mockapi.io",
 });
 
-export async function addAccount(userName, password) {
+export async function addAccount(userName, password, id, fullName) {
     try {
         const response = await api.post("/accounts", {
             userName,
-            password,      
+            password,
+            id,
+            fullName,
         });
         return response.data;
     } catch (error) {
@@ -35,9 +37,15 @@ export async function deleteAccount(accountId) {
     }
 }
 
-export async function updateAccount(accountId, userName, password) {
+export async function updateAccount(accountId, userName, password, id, fullName) {
     try {
-        const response = await api.put(`/accounts/${accountId}`, userName, password);
+        const response = await api.put(
+            `/accounts/${accountId}`,
+            userName,
+            password,
+            id,
+            fullName
+        );
         return response;
     } catch (error) {
         throw new Error(`Có lỗi ${error.message}`);
@@ -52,3 +60,12 @@ export async function getAccountById(accountId) {
         throw new Error(`Error fetching account ${error.message}`);
     }
 }
+
+// export async function searchAccount(page, searchValue) {
+//     try {
+//         const result = await api.get(`/accounts?page=${page}&searchValue=${searchValue}`);
+//         return result.data;
+//     } catch (error) {
+//         throw new Error(`Error searching account ${error.message}`);
+//     }
+// }

@@ -1,3 +1,4 @@
+// Import thêm useState từ react
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,7 +15,13 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 import useDebounce from "../../components/hooks/useDebounce";
 import * as searchServices from "../../components/services/searchService";
-import * as api from "../../components/api/ApiList";
+import {
+    rejectReservation,
+    
+    getAllList,
+    confirmReservation,
+} from "../../components/api/ApiList.jsx";
+
 import "./list.scss";
 
 const List = () => {
@@ -51,7 +58,7 @@ const List = () => {
         const fetchLists = async () => {
             try {
                 setIsLoading(true);
-                const result = await api.getAllList();
+                const result = await getAllList();
                 if (result) {
                     setLists(result);
                     setFilteredRows(result);
@@ -124,79 +131,45 @@ const List = () => {
 
     const handleConfirm = async (listId) => {
         try {
-            const confirmedItemIndex = lists.findIndex((list) => list.listId === listId);
-
-            if (confirmedItemIndex !== -1) {
-                const updatedFilteredRows = [...filteredRows];
-                updatedFilteredRows[confirmedItemIndex].status = 2;
-                setFilteredRows(updatedFilteredRows);
-
-                await api.updateListStatus(listId, 2); // Cập nhật trạng thái của danh sách
-
-                const confirmedItem = lists[confirmedItemIndex];
-
-                // Gửi mục đã xác nhận đến API lịch sử
-                await fetch("https://66359f0e415f4e1a5e24f92a.mockapi.io/histories", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(confirmedItem),
-                });
-
-                // Xóa danh sách có trạng thái là 2 khỏi API lists
-                await api.deleteList(listId);
-
-                // Cập nhật danh sách để chỉ giữ lại các mục có trạng thái là 1
-                const updatedLists = lists.filter((list) => list.status !== 2);
+            const success = await confirmReservation(listId);
+            if (success) {
+                // Xác nhận thành công
+                toast.success("Xác nhận đặt phòng thành công!");
+                // Cập nhật trạng thái đặt phòng trong danh sách
+                const updatedLists = lists.map((item) =>
+                    item.listId === listId ? { ...item, status: 2 } : item
+                );
                 setLists(updatedLists);
                 setFilteredRows(updatedLists);
-
-                toast.success("Xác nhận đặt phòng thành công!");
+                window.location.reload();
             } else {
-                toast.error("Không tìm thấy mục cần xác nhận trong danh sách.");
+                // Xác nhận thất bại
+                toast.error("Xác nhận đặt phòng thất bại!");
             }
         } catch (error) {
-            toast.error(`Lỗi khi xác nhận đặt phòng: ${error.message}`);
+            toast.error(`Có lỗi: ${error.message}`);
         }
     };
 
     const handleReject = async (listId) => {
         try {
-            const rejectedItemIndex = lists.findIndex((list) => list.listId === listId);
-
-            if (rejectedItemIndex !== -1) {
-                const updatedFilteredRows = [...filteredRows];
-                updatedFilteredRows[rejectedItemIndex].status = 3; // Cập nhật trạng thái là 3 (từ chối)
-                setFilteredRows(updatedFilteredRows);
-
-                await api.updateListStatus(listId, 3); // Cập nhật trạng thái của danh sách thành 3 (từ chối)
-
-                const rejectedItem = lists[rejectedItemIndex];
-
-                // Gửi mục đã từ chối đến API lịch sử
-                await fetch("https://66359f0e415f4e1a5e24f92a.mockapi.io/histories", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(rejectedItem),
-                });
-
-                // Xóa danh sách có trạng thái là 3 (từ chối) khỏi API lists
-                await api.deleteList(listId);
-
-                // Cập nhật danh sách để chỉ giữ lại các mục có trạng thái khác 3
-                const updatedLists = lists.filter((list) => list.status !== 3);
+            const success = await rejectReservation(listId);
+            if (success) {
+                // Từ chối thành công
+                toast.success("Từ chối đặt phòng thành công!");       
+                // Cập nhật trạng thái đặt phòng trong danh sách
+                const updatedLists = lists.map((item) =>
+                    item.listId === listId ? { ...item, status: 5 } : item
+                );
                 setLists(updatedLists);
                 setFilteredRows(updatedLists);
-
-                toast.success("Từ chối đặt phòng thành công!");
+                window.location.reload();
             } else {
-                toast.error("Không tìm thấy mục cần từ chối trong danh sách.");
+                // Từ chối thất bại
+                toast.error("Từ chối đặt phòng thất bại!");
             }
         } catch (error) {
-            toast.error(`Lỗi khi từ chối đặt phòng: ${error.message}`);
+            toast.error(`Có lỗi: ${error.message}`);
         }
     };
 
@@ -242,8 +215,7 @@ const List = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                            <span className="no-mess">{search}</span>
+                                            Không tìm thấy kết quả tìm kiếm.
                                         </div>
                                     )}
                                     <Table
@@ -291,7 +263,7 @@ const List = () => {
                                                     page * rowsPerPage
                                                 )
                                                 .map((list) => (
-                                                    <TableRow key={list.listId}>
+                                                    <TableRow key={list.id}>
                                                         <TableCell className="tableCell">
                                                             <div className="cellWrapper">
                                                                 <img
@@ -334,7 +306,7 @@ const List = () => {
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
                                                                     handleReject(
-                                                                        list.listId
+                                                                        list.id
                                                                     )
                                                                 }
                                                             >
@@ -344,7 +316,7 @@ const List = () => {
                                                                 className="updateBtn btn"
                                                                 onClick={() =>
                                                                     handleConfirm(
-                                                                        list.listId
+                                                                        list.id
                                                                     )
                                                                 }
                                                             >

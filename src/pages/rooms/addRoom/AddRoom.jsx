@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { addRoom, getAllRooms } from "../../../components/api/ApiRoom";
+import { addRoom } from "../../../components/api/ApiRoom";
 import { getAllType } from "../../../components/api/ApiTypeRoom";
+import { getAllRooms } from "../../../components/api/ApiRoom";
+
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
@@ -13,21 +15,20 @@ const AddRoom = () => {
     const [newRoom, setNewRoom] = useState({
         img: null,
         nameRoom: "",
-        //  được sử dụng để hiển thị và lưu trữ tạm thời giá trị của loại phòng mà người dùng đã chọn, trong khi typeId được sử dụng để xác định ID của loại phòng để lưu vào cơ sở dữ liệu.
-        roomType: "", // Khi người dùng chọn một loại phòng từ dropdown, giá trị của roomType sẽ được cập nhật tương ứng với ID của loại phòng được chọn.
         area: "",
         countOfSeat: "",
         description: "",
         typeId: "",
+        typeName: ""
     });
+
     const [imagePreview, setImagePreview] = useState("");
     const [roomTypes, setRoomTypes] = useState([]);
-    const [selectedRoomTypeId, setSelectedRoomTypeId] = useState(""); // State mới để lưu trữ ID của loại phòng được chọn
     const [errors, setErrors] = useState({
         nameRoom: "",
         area: "",
         countOfSeat: "",
-        roomType: "",
+        typeName: "",
     });
 
     useEffect(() => {
@@ -40,7 +41,7 @@ const AddRoom = () => {
             }
         };
         fetchRoomTypes();
-    }, []);
+    }, []);   
 
     const handleRoomInputChange = (e) => {
         const { name, value } = e.target;
@@ -49,12 +50,20 @@ const AddRoom = () => {
 
     const handleRoomTypeChange = (e) => {
         const selectedRoomType = e.target.value;
-        setSelectedRoomTypeId(selectedRoomType);
-        setNewRoom({ ...newRoom, roomType: selectedRoomType }); // Cập nhật roomType trong state newRoom với ID của loại phòng được chọn
-        setErrors((prevErrors) => ({
-            ...prevErrors,
-            roomType: "", // Xóa thông báo lỗi khi người dùng chọn một loại phòng mới
-        }));
+        const selectedType = roomTypes.find((type) => type.typeName === selectedRoomType);
+
+        if (selectedType) {
+            setNewRoom({
+                ...newRoom,
+                typeId: selectedType.typeId,
+                typeName: selectedRoomType, // Sử dụng roomType thay vì typeName
+            });
+
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                roomType: "", // Xóa thông báo lỗi khi người dùng chọn một loại phòng mới
+            }));
+        }
     };
 
     const handleImageChange = (e) => {
@@ -96,11 +105,11 @@ const AddRoom = () => {
             newErrors.countOfSeat = "";
         }
 
-        if (!selectedRoomTypeId) {
-            newErrors.roomType = "Vui lòng chọn loại phòng.";
+        if (!newRoom.typeId) {
+            newErrors.typeName = "Vui lòng chọn loại phòng.";
             hasErrors = true;
         } else {
-            newErrors.roomType = "";
+            newErrors.typeName = "";
         }
 
         if (hasErrors) {
@@ -116,7 +125,8 @@ const AddRoom = () => {
                 newRoom.countOfSeat,
                 newRoom.description,
                 1,
-                selectedRoomTypeId // Truyền ID của loại phòng đã chọn vào hàm addRoom
+                newRoom.typeId,
+                newRoom.typeName
             );
             toast.success("Phòng đã được thêm vào cơ sở dữ liệu");
             setNewRoom({
@@ -125,14 +135,15 @@ const AddRoom = () => {
                 area: "",
                 countOfSeat: "",
                 description: "",
+                typeName: "",
             });
             setImagePreview("");
-            setSelectedRoomTypeId(""); // Reset state của loại phòng được chọn
+
             setErrors({
                 nameRoom: "",
                 area: "",
                 countOfSeat: "",
-                roomType: "",
+                typeName: "",
             });
         } catch (error) {
             toast.error(error.message);
@@ -197,20 +208,23 @@ const AddRoom = () => {
                                     <label>Loại phòng: </label>
                                     <select
                                         className="select"
-                                        onChange={handleRoomTypeChange} // Sử dụng hàm xử lý mới để cập nhật state
-                                        name="roomType"
-                                        value={selectedRoomTypeId} // Sử dụng state mới để giữ giá trị của dropdown
-                                        onFocus={() => handleInputFocus("roomType")}
+                                        onChange={handleRoomTypeChange}
+                                        name="typeName" 
+                                        value={newRoom.typeName}
+                                        onFocus={() => handleInputFocus("typeName")}
                                     >
                                         <option>-- Chọn loại phòng --</option>
                                         {roomTypes.map((type) => (
-                                            <option key={type.typeId} value={type.typeId}>
+                                            <option
+                                                key={type.typeId}
+                                                value={type.typeName} 
+                                            >
                                                 {type.typeName}
                                             </option>
                                         ))}
                                     </select>
-                                    {errors.roomType && (
-                                        <div className="error">{errors.roomType}</div>
+                                    {errors.typeName && (
+                                        <div className="error">{errors.typeName}</div>
                                     )}
                                 </div>
                                 <div className="formInput">
