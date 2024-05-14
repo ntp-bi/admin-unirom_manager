@@ -10,7 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { fetchReportsByDate } from "../../../components/api/ApiReport";
+import { fetchReportsByDate, exportExcelByYear } from "../../../components/api/ApiReport";
 
 import "./main-report.scss";
 
@@ -22,36 +22,6 @@ const Report = () => {
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedMonth, setSelectedMonth] = useState("");
     const [selectedYear, setSelectedYear] = useState("");
-
-    const handleStatistics = async () => {
-        if (!selectedYear) {
-            alert("Vui lòng chọn thông tin trước khi thực hiện thống kê.");
-            return;
-        }
-    
-        // gọi hàm fetchReportsByDate từ API để lấy dữ liệu báo cáo dựa trên ngày, tháng và năm được chọn.
-        const response = await fetchReportsByDate(selectedDay, selectedMonth, selectedYear);
-        const data = response.data;
-    
-        if (data) {
-            // Xử lý dữ liệu thống kê
-            setReports([data]);
-    
-            // Xử lý phòng được đặt nhiều nhất
-            const mostBookedRooms = data.theMostRoomTypeOfBooking;
-            setMostBookedRooms(mostBookedRooms);
-    
-            // Xử lý phòng được đặt ít nhất
-            const leastBookedRooms = data.leastOfRoomTypeOfBooking;
-            setLeastBookedRooms(leastBookedRooms);
-        } else {
-            setReports([]);
-            setMostBookedRooms([]);
-            setLeastBookedRooms([]);
-        }
-    };
-    
-    
 
     const handleDayChange = (event) => {
         setSelectedDay(event.target.value);
@@ -73,6 +43,75 @@ const Report = () => {
 
     // Tạo mảng chứa năm từ 2021 đến 2030 (ví dụ)
     const years = Array.from({ length: 10 }, (_, index) => 2021 + index);
+
+    const handleStatistics = async () => {
+        if (!selectedYear) {
+            alert("Vui lòng chọn thông tin trước khi thực hiện thống kê.");
+            return;
+        }
+
+        // gọi hàm fetchReportsByDate từ API để lấy dữ liệu báo cáo dựa trên ngày, tháng và năm được chọn.
+        const response = await fetchReportsByDate(
+            selectedDay,
+            selectedMonth,
+            selectedYear
+        );
+        const data = response.data;
+
+        if (data) {
+            // Xử lý dữ liệu thống kê
+            setReports([data]);
+
+            // Xử lý phòng được đặt nhiều nhất
+            const mostBookedRooms = data.theMostRoomTypeOfBooking;
+            setMostBookedRooms(mostBookedRooms);
+
+            // Xử lý phòng được đặt ít nhất
+            const leastBookedRooms = data.leastOfRoomTypeOfBooking;
+            setLeastBookedRooms(leastBookedRooms);
+        } else {
+            setReports([]);
+            setMostBookedRooms([]);
+            setLeastBookedRooms([]);
+        }
+    };
+
+    const handleExportExcel = async () => {
+        if (!selectedYear) {
+            alert("Vui lòng chọn đầy đủ thông tin trước khi xuất file Excel.");
+            return;
+        }
+
+        try {
+            // Gọi API để xuất file Excel
+            const response = await exportExcelByYear(
+                selectedDay,
+                selectedMonth,
+                selectedYear
+            );
+            const blob = new Blob([response], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+
+            // Tạo một thẻ a để tải file
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute(
+                "download",
+                `report_${selectedDay}_${selectedMonth}_${selectedYear}.xlsx`
+            );
+            document.body.appendChild(link);
+
+            // Kích hoạt sự kiện click để tải file
+            link.click();
+
+            // Xóa URL sau khi tải xong
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Lỗi khi xuất file Excel:", error);
+        }
+    };
 
     return (
         <div className="report">
@@ -122,7 +161,12 @@ const Report = () => {
                                 </option>
                             ))}
                         </select>
-                        <button onClick={handleStatistics}>Thống kê</button>
+                        <button className="btn" onClick={handleStatistics}>
+                            Thống kê
+                        </button>
+                        <button className="btn excel" onClick={handleExportExcel}>
+                            Xuất file excel
+                        </button>
                     </div>
 
                     <div className="reportDetails">

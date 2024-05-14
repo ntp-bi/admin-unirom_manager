@@ -1,12 +1,12 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "http://localhost:8080/room/admin",
+    baseURL: "http://localhost:8080/detail/both",
 });
 
 export const getAllList = async () => {
     try {
-        const result = await api.get("/BookingHistory/Search");
+        const result = await api.get("/getdetailnonaccept");
         return result.data.data;
     } catch (error) {
         throw new Error("Error fetching Account");
@@ -47,3 +47,12 @@ export const rejectReservation = async (listId) => {
         throw new Error(error.message);
     }
 };
+
+export async function searchList(name) {
+    try {
+        const result = await api.get(`/BookingHistory/Search?key=${name}`);
+        return result.data.data;
+    } catch (error) {
+        throw new Error(`Error searching histories: ${error.message}`);
+    }
+}

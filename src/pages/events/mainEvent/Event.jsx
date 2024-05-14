@@ -20,7 +20,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as searchServices from "../../../components/services/searchService";
 import * as api from "../../../components/api/ApiEvent";
 
 import "./event.scss";
@@ -72,10 +71,10 @@ const Event = () => {
         const fetchApi = async () => {
             setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
+           // const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
             setLoadingSearch(false); // Kết thúc tải dữ liệu
-            return result; // Trả về kết quả
+           // return result; // Trả về kết quả
         };
 
         // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng

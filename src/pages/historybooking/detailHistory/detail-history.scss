@@ -13,86 +13,102 @@
             padding: 10px;
             margin: 20px;
             display: flex;
+            flex-direction: column;
 
-            span {
+            .title {
                 color: #210876;
                 font-size: 24px;
                 font-weight: 600;
             }
 
-            .right {
-                
-                flex: 2;
+            .historry-action {
+                display: flex;
+                justify-content: end;
+                padding: 10px 30px 20px;
+                margin-right: 10px;
 
-                .historry-action {
-                    display: flex;
-                    justify-content: end;
-                    padding: 10px 30px 40px;
-                    margin-right: 30px;                     
+                .completeBtn {
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border: 1px dotted #fff;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    background-color: #28a745;
+                    transition: background-color 0.3s linear;
 
-                    .completeBtn {
-                        color: green;
-                        font-size: 16px;
-                        font-weight: 400;
-                        border: 1px dotted green;
-                        padding: 5px;
-                        border-radius: 5px;
-                        margin-right: 10px;
-                        cursor: pointer;
-                        transition: background-color 0.3s linear;
-        
-                        &:hover {
-                            background-color: #d0e3d0;
-                        }
-                    }
-
-                    .deleteBtn {
-                        padding: 4px 8px;
-                        border-radius: 5px;
-                        color: crimson;
-
-                        border: 1px dotted rgba(220, 20, 60, 0.6);
-                        cursor: pointer;
-                        font-size: 15px;
-                        margin-right: 10px;
-                        font-weight: 600;
-
-                        &:hover {
-                            background-color: #f6e9e9;
-                            transition: 0.3s ease;
-                        }
-                    }
-
-                    .backBtn {
-                        padding: 5px 8px;
-                        border-radius: 5px;
-                        color: #31b0d5;
-                        border: 1px dotted #31b0d5;
-                        cursor: pointer;
-                        font-size: 15px;
-                        font-weight: 600;
-                    }
-
-                    .formInput {
-                        margin-right: 20px;
-                        width: 20%;
-
-                        .select {
-                            border: 1px solid gray;
-                            width: 100%;
-                            padding: 4px;
-                            font-size: 14px;
-                            outline: none;
-                            border-radius: 2px;
-                        }
+                    &:hover {
+                        background-color: #218838;
                     }
                 }
 
-                form {
+                .deleteBtn {
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border: 1px dotted #fff;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    background-color: #dc3545;
+                    transition: background-color 0.3s linear;
+
+                    &:hover {
+                        background-color: #c82333;
+                    }
+                }
+
+                .backBtn {
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border: 1px dotted #fff;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    background-color: #3c8dbc;
+                    transition: background-color 0.3s linear;
+
+                    &:hover {
+                        background-color: #367fa9;
+                    }
+                }
+            }
+
+            form {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 30px;
+                padding: 0 0 30px 0;
+
+                .left {
+                    width: 30%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    img {
+                        width: 300px;
+                        height: 300px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 1px solid #ddd;
+                        margin-top: 20px;
+                    }
+                }
+
+                .right {
+                    width: 70%;
+
                     display: flex;
                     flex-wrap: wrap;
                     gap: 30px;
-                    justify-content: space-around;
+                    justify-content: space-evenly;
                     position: relative;
 
                     .formInput {
@@ -108,49 +124,99 @@
                             .icon {
                                 cursor: pointer;
                             }
-                                                                                                      
-                            .time-end {
-                                margin-left: 16px;
+
+                            .info {
+                                font-size: 16px;
+                                color: #333;
+                                font-weight: 500;
                             }
                         }
 
-                        .name {
-                            margin-left: 32px;
-                        }
-
-                        .name-room {
-                            margin-left: 4px;
-                        }
-
-                        .info {
-                            color: #333;
+                        input {
+                            width: 100%;
+                            padding: 5px;
+                            border: none;
+                            border-bottom: 1px solid gray;
                             font-size: 16px;
-                        }
+                            outline: none;
+                            background-color: transparent;
 
-                        .time-return {
-                            margin-left: 3px;
-                        }
-
-                        .status {
-                            margin-left: 72px;
+                            &::placeholder {
+                                font-size: 15px;
+                            }
                         }
 
                         .select {
                             border: 1px solid gray;
-                            width: 60%;
+                            width: 103%;
                             padding: 4px;
                             font-size: 14px;
                             margin-top: 6px;
-                            outline: none;                               
+                            outline: none;
                         }
-                    }       
-                }
-                .btn-action {
-                    .back {
-                        color: goldenrod;
-                        border: 1px dotted goldenrod;
-                        margin-right: 50px;
-                        // margin-left: 510px;
+                    }
+
+                    .formArea {
+                        width: 100%;
+                        margin-left: 33px;
+
+                        label {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            color: #210876;
+                            font-weight: 600;
+                            margin-bottom: 10px;
+                        }
+
+                        .desc {
+                            width: 94%;
+                            height: 60px;
+                            padding: 10px 12px 10px 10px;
+                            font-size: 18px;
+                            outline: none;
+
+                            &::placeholder {
+                                font-size: 15px;
+                            }
+                        }
+                    }
+
+                    .btn-action {
+                        display: flex;
+                        align-items: center;
+                        position: absolute;
+                        right: 22px;
+                        bottom: -56px;
+
+                        .back {
+                            color: #333;
+                            background-color: #f4f4f4;
+                            border: 1px dotted #bbbb;
+                            transition: background-color 0.3s linear;
+
+                            &:hover {
+                                background-color: #e7e7e7;
+                            }
+                        }
+                    }
+
+                    button {
+                        color: #fff;
+                        font-size: 16px;
+                        font-weight: 600;
+                        border: 1px dotted #fff;
+                        padding: 5px;
+                        width: 100px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        margin-left: 20px;
+                        background-color: #3c8dbc;
+                        transition: background-color 0.3s linear;
+
+                        &:hover {
+                            background-color: #367fa9;
+                        }
                     }
                 }
             }
@@ -158,8 +224,6 @@
 
         .bottom {
             border-top: 3px solid #31b0d5;
-            padding: 20px 0 50px;
-            box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
         }
     }
 }

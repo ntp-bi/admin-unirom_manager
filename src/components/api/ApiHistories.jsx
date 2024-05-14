@@ -1,12 +1,12 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "http://localhost:8080/room/admin",
+    baseURL: "http://localhost:8080/admin",
 });
 
 export async function getAllHistory() {
     try {
-        const result = await api.get("BookingHistory/Search");
+        const result = await api.get("/BookingHistory/Search");
         return result.data.data;
     } catch (error) {
         throw new Error("Error fetching history");
@@ -31,20 +31,25 @@ export async function getHistoryById(historyId) {
     }
 }
 
-export async function completeHistory(historyId) {
+export async function searchHistories(name) {
     try {
-        const result = await api.put(`/histories/${historyId}`, { endTime: new Date() });
-        return result.data;
+        const result = await api.get(`/BookingHistory/Search?key=${name}`);
+        return result.data.data || []; 
     } catch (error) {
-        throw new Error(`Error completing history: ${error.message}`);
+        console.error(`Error searching histories: ${error.message}`);
+        return []; 
     }
 }
 
-// export async function updateHistoryStatus(historyId, newStatus) {
-//     try {
-//         const result = await api.put(`/histories/${historyId}`, { status: newStatus });
-//         return result.data;
-//     } catch (error) {
-//         throw new Error(`Error updating history status: ${error.message}`);
-//     }
-// }
+export const confirmCompleted = async (listId) => {
+    try {
+        const response = await api.get(`/BookingHistory/Accept/${listId}`);
+        if (response.status === 200 && response.data.data === true) {
+            return true; // Xác nhận thành công
+        } else {
+            return false; // Xác nhận thất bại
+        }
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};

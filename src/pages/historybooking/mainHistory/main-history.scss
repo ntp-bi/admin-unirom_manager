@@ -69,7 +69,7 @@
 
                 .MuiInputBase-root {
                     outline: none;
-                    border: 1px solid #333;
+                    border: -1px solid #000;
                     width: 300px;
                     padding: 4px 10px;
                     font-size: 15px;
@@ -83,6 +83,10 @@
                         color: #000 !important;
                         padding: 11.5px 33px !important;
                     }
+                }
+
+                .css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+                    border-color: #616161;
                 }
 
                 .css-nby9nv-MuiStack-root {

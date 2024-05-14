@@ -8,6 +8,8 @@ import Navbar from "../../../components/navbar/Navbar";
 import { updateAccount, getAccountById } from "../../../components/api/ApiAccount";
 import { getAllTeachers } from "../../../components/api/ApiTeacher";
 
+import "./update-account.scss"
+
 const UpdateAccount = () => {
     const { accountId } = useParams();
 

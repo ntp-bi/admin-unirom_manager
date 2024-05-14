@@ -9,6 +9,7 @@ import useDebounce from "../../../components/hooks/useDebounce";
 
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -30,8 +31,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as searchServices from "../../../components/services/searchService";
-
 import * as api from "../../../components/api/ApiHistories";
 
 import "./main-history.scss";
@@ -40,7 +39,7 @@ dayjs.locale("vi"); // Set locale to Vietnamese
 
 const History = () => {
     const [histories, setHistories] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState({});
+    const [selectedStatus, setSelectedStatus] = useState(0);
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
     const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
@@ -108,14 +107,13 @@ const History = () => {
         const fetchApi = async () => {
             setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
-
+            const result = await api.searchHistories(debouncedValue);
             setLoadingSearch(false); // Kết thúc tải dữ liệu
             return result; // Trả về kết quả
         };
 
         // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
-        if (debouncedValue.trim() !== "" && search.trim() !== "") {
+        if (debouncedValue.trim() !== "") {
             fetchApi(); // Gọi hàm fetchApi
         }
     }, [debouncedValue]);
@@ -124,6 +122,8 @@ const History = () => {
         setSearch("");
         inputRef.current.focus();
         setFilteredRows(histories);
+        setSelectedStatus("");
+        setSelectedDateRange([null, null]);
     };
 
     const handleSearchChange = (event) => {
@@ -140,13 +140,13 @@ const History = () => {
     // Xử lý khi trạng thái thay đổi
     const handleStatusChange = (event) => {
         const selectedStatusValue = convertStatusToNumber(event.target.value);
-        setSelectedStatus(selectedStatusValue); // Sửa status thành selectedStatus
-        filterRows(selectedStatusValue, search, selectedDateRange); // Sửa status thành selectedStatus
+        setSelectedStatus(selectedStatusValue); 
+        filterRows(selectedStatusValue, debouncedValue, selectedDateRange); 
     };
 
     // Xử lý khi click vào button tìm kiếm
     const handleSearch = () => {
-        filterRows(selectedStatus, search, selectedDateRange);
+        filterRows(selectedStatus, debouncedValue, selectedDateRange);
     };
 
     const filterRows = (selectedStatus, searchTerm, dateRange) => {
@@ -155,20 +155,17 @@ const History = () => {
             const statusMatch = !selectedStatus || history.status === selectedStatus;
             const nameMatch =
                 !searchTerm ||
-                (typeof searchTerm === "string" &&
-                    searchTerm.trim() !== "" &&
-                    ((history.fullName &&
-                        history.fullName
-                            .toLowerCase()
-                            .includes(searchTerm.toLowerCase())) ||
-                        (history.roomName &&
-                            history.roomName
-                                .toLowerCase()
-                                .includes(searchTerm.toLowerCase()))));
-            const reserveTime = dayjs(history.reserveTime, "DD/MM/YYYY HH:mm:ss");
+                (history.fullName &&
+                    history.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (history.roomName &&
+                    history.roomName.toLowerCase().includes(searchTerm.toLowerCase()));
             const timeMatch =
-                (!startDate || reserveTime >= startDate) &&
-                (!endDate || reserveTime <= endDate.endOf("day"));
+                (!startDate ||
+                    dayjs(history.reserveTime).isAfter(startDate) ||
+                    dayjs(history.reserveTime).isSame(startDate, "day")) &&
+                (!endDate ||
+                    dayjs(history.endTime).isBefore(endDate) ||
+                    dayjs(history.endTime).isSame(endDate, "day"));
             return statusMatch && nameMatch && timeMatch;
         });
         setFilteredRows(filteredRows);
@@ -195,24 +192,26 @@ const History = () => {
                             value={selectedStatus}
                             onChange={handleStatusChange}
                         >
-                            <option value="">-- Chọn trạng thái --</option>
+                            <option value={0}>-- Chọn trạng thái --</option>
                             {statuses.map((status) => (
                                 <option key={status} value={status}>
                                     {STATUS_LABELS[status]}
                                 </option>
                             ))}
                         </select>
+                        
                         <LocalizationProvider dateAdapter={AdapterDayjs} locale="vi">
                             <DemoContainer components={["SingleInputDateRangeField"]}>
                                 <DateRangePicker
+                                    inputFormat="DD/MM/YYYY"
                                     slots={{ field: SingleInputDateRangeField }}
                                     name="allowedRange"
                                     value={selectedDateRange}
                                     onChange={handleDateRangeChange}
-                                    inputFormat={(date) => format(date, "DD/MM/YYYY")}
                                 />
                             </DemoContainer>
                         </LocalizationProvider>
+
                         <div className="search">
                             <input
                                 ref={inputRef}
@@ -246,8 +245,7 @@ const History = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm với từ khóa:{" "}
-                                            <span className="no-mess">{search}</span>
+                                            Không tìm thấy kết quả tìm kiếm.
                                         </div>
                                     )}
                                     <Table
@@ -305,16 +303,34 @@ const History = () => {
                                                             {history.fullName}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {history.reserveTime}
+                                                            {format(
+                                                                new Date(
+                                                                    history.reserveTime
+                                                                ),
+                                                                "dd/MM/yyyy HH:mm:ss"
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {history.returnTime}
+                                                            {format(
+                                                                new Date(
+                                                                    history.returnTime
+                                                                ),
+                                                                "dd/MM/yyyy HH:mm:ss"
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {history.acceptTime}
+                                                            {format(
+                                                                new Date(
+                                                                    history.acceptTime
+                                                                ),
+                                                                "dd/MM/yyyy HH:mm:ss"
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {history.endTime}
+                                                            {format(
+                                                                new Date(history.endTime),
+                                                                "dd/MM/yyyy HH:mm:ss"
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
                                                             <span

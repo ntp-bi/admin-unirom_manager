@@ -20,7 +20,6 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
-import * as searchServices from "../../../components/services/searchService";
 import * as api from "../../../components/api/ApiAccount"
 
 import "./main-account.scss";
@@ -72,10 +71,10 @@ const Account = () => {
         const fetchApi = async () => {
             setLoadingSearch(true); // Đang tải dữ liệu
 
-            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
+            //const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
             setLoadingSearch(false); // Kết thúc tải dữ liệu
-            return result; // Trả về kết quả
+            //return result; // Trả về kết quả
         };
 
         // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng

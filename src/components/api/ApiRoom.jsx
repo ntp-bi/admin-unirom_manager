@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "https://66332f56f7d50bbd9b4872b3.mockapi.io",
+    baseURL: "http://localhost:8080/room/both",
 });
 
 export async function addRoom(
@@ -35,8 +35,8 @@ export async function addRoom(
 // This function gets all rooms from the database
 export async function getAllRooms() {
     try {
-        const result = await api.get("/rooms");
-        return result.data;
+        const result = await api.get("/getallroom");
+        return result.data.data;
     } catch (error) {
         throw new Error("Error fetching rooms");
     }
@@ -83,5 +83,14 @@ export async function getRoomById(roomId) {
         return result.data;
     } catch (error) {
         throw new Error(`Error fetching room ${error.message}`);
+    }
+}
+
+export async function searchRoom(name) {
+    try {
+        const result = await api.get(`/BookingHistory/Search?key=${name}`);
+        return result.data.data;
+    } catch (error) {
+        throw new Error(`Error searching histories: ${error.message}`);
     }
 }

@@ -64,6 +64,16 @@
                             font-size: 14px;
                             margin-top: 6px;
                             outline: none;
+                            border-radius: 2px;
+                        }
+                        .select option {
+                            background-color: #fff;
+                            color: #000;
+                        }
+
+                        .select option:checked {
+                            background-color: #31b0d5;
+                            color: #fff;
                         }
                     }
 

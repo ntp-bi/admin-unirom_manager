@@ -49,3 +49,12 @@ export async function getTypeById(typeId) {
         throw new Error(`Error fetching type ${error.message}`);
     }
 }
+
+export async function searchTypeRoom(name) {
+    try {
+        const result = await api.get(`/BookingHistory/Search?key=${name}`);
+        return result.data.data;
+    } catch (error) {
+        throw new Error(`Error searching histories: ${error.message}`);
+    }
+}

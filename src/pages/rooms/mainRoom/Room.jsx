@@ -19,7 +19,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as searchServices from "../../../components/services/searchService";
 import * as api from "../../../components/api/ApiRoom";
 import * as typeApi from "../../../components/api/ApiTypeRoom";
 
@@ -31,19 +30,17 @@ const Room = () => {
     const [status, setStatus] = useState(0);
     const [search, setSearch] = useState("");
     const [roomType, setRoomType] = useState("");
-    const [isLoading, setIsLoading] = useState(false); // State loading tải dữ liệu khi searchValue
-    const [loadingSearch, setLoadingSearch] = useState(false); // State loading tải dữ liệu khi searchValue
-    const [filteredRows, setFilteredRows] = useState([]); // State lưu trữ dữ liệu đã lọc
-    const [dataLoaded, setDataLoaded] = useState(false); // State kiểm tra xem dữ liệu đã được tải hay chưa
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingSearch, setLoadingSearch] = useState(false);
+    const [filteredRows, setFilteredRows] = useState([]);
 
     const [page, setPage] = useState(1);
     const rowsPerPage = 7;
 
-    const debouncedValue = useDebounce(search, 500); // Giá trị tìm kiếm được làm trì hoãn
+    const debouncedValue = useDebounce(search, 500); 
 
     const inputRef = useRef(); // Tham chiếu đến input tìm kiếm
 
-    // Lấy danh sách loại phòng và trạng thái từ dữ liệu thực tế
     const statuses = [...new Set(rooms.map((room) => room.status))];
 
     const STATUS_LABELS = {
@@ -63,26 +60,11 @@ const Room = () => {
             default:
                 return "";
         }
-    };
-
-    // Tạo một hàm để tìm loại phòng dựa trên typeId
-    const findRoomType = (typeId) => {
-        // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
-        const roomType = roomTypes.find(
-            (type) => parseInt(type.typeId) === parseInt(typeId)
-        );
-
-        // Kiểm tra xem roomType có tồn tại không
-        if (roomType) {
-            return roomType.typeName; // Trả về tên của loại phòng nếu tồn tại
-        } else {
-            return "Unknown"; // Trả về "Unknown" nếu không tìm thấy loại phòng
-        }
-    };
+    };    
 
     useEffect(() => {
-        fetchRooms(); // Gọi hàm fetchRooms khi component được render
-        fetchRoomTypes(); // Gọi hàm fetchRoomTypes khi component được render
+        fetchRooms();
+        fetchRoomTypes();
     }, []);
 
     // Hàm gọi API để lấy danh sách phòng
@@ -91,9 +73,8 @@ const Room = () => {
             setIsLoading(true);
             const result = await api.getAllRooms();
             setRooms(result);
-            setFilteredRows(result); // Cập nhật lại danh sách khi xóa
+            setFilteredRows(result);
             setIsLoading(false);
-            setDataLoaded(true);
         } catch (error) {
             setIsLoading(false);
             toast.error(`Có lỗi: ${error.message}`);
@@ -102,73 +83,76 @@ const Room = () => {
 
     const fetchRoomTypes = async () => {
         try {
-            const result = await typeApi.getAllType(); // Gọi API để lấy danh sách loại phòng
-            setRoomTypes(result); // Lưu trữ danh sách loại phòng vào state
+            const result = await typeApi.getAllType();
+            setRoomTypes(result);
         } catch (error) {
             toast.error(`Có lỗi: ${error.message}`);
         }
     };
 
-    // Lọc dữ liệu khi có sự thay đổi trong các trạng thái lọc và từ khóa tìm kiếm
-    useEffect(() => {
-        if (dataLoaded) {
-            // Chỉ lọc dữ liệu khi dữ liệu đã được tải
-            filterRows(roomType, status, debouncedValue);
+    // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
+    const findRoomType = (typeId) => {
+        const roomType = roomTypes.find(
+            (type) => parseInt(type.typeId) === parseInt(typeId)
+        );
+        // Kiểm tra xem roomType có tồn tại không
+        if (roomType) {
+            return roomType.typeName;
+        } else {
+            return "Unknown";
         }
-    }, [dataLoaded]);
+    };
 
     // Hàm xử lý tìm kiếm khi có sự thay đổi trong từ khóa tìm kiếm
     useEffect(() => {
         const fetchApi = async () => {
-            setLoadingSearch(true); // Đang tải dữ liệu
+            setLoadingSearch(true);
+            //  const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
-            const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
-
-            setLoadingSearch(false); // Kết thúc tải dữ liệu
-            return result; // Trả về kết quả
+            setLoadingSearch(false); 
+            //  return result;
         };
 
-        // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
-        if (debouncedValue.trim() !== "" && search.trim() !== "") {
-            fetchApi(); // Gọi hàm fetchApi
+        if (debouncedValue.trim() !== "") {
+            fetchApi();
         }
     }, [debouncedValue]);
 
     // Xử lý sự kiện khi người dùng xóa từ khóa tìm kiếm
     const handleClear = () => {
-        setSearch(""); // Xóa từ khóa tìm kiếm
-        inputRef.current.focus(); // Focus vào input tìm kiếm
-        setFilteredRows(rooms); // Reset dữ liệu đã lọc
+        setSearch(""); 
+        inputRef.current.focus(); 
+        setFilteredRows(rooms); 
     };
 
     // Xử lý sự kiện khi người dùng thay đổi từ khóa tìm kiếm
     const handleSearchChange = (event) => {
         const searchValue = event.target.value;
         if (!searchValue.startsWith(" ")) {
-            setSearch(searchValue); // Cập nhật từ khóa tìm kiếm
+            setSearch(searchValue); 
         }
     };
 
     // Xử lý sự kiện khi người dùng thay đổi trang
     const handleChangePage = (event, newPage) => {
-        setPage(newPage); // Cập nhật trang hiện tại
+        setPage(newPage); 
     };
 
     // Xử lý sự kiện khi người dùng thay đổi loại phòng
     const handleRoomTypeChange = (event) => {
-        setRoomType(event.target.value); // Cập nhật loại phòng
+        setRoomType(event.target.value); 
         filterRows(event.target.value, status, search); // Lọc dữ liệu
     };
 
     // Xử lý sự kiện khi người dùng thay đổi trạng thái
     const handleStatusChange = (event) => {
-        const selectedStatus = parseInt(event.target.value); // Chuyển đổi giá trị sang kiểu number
+        const selectedStatus = parseInt(event.target.value); 
         setStatus(selectedStatus);
         filterRows(roomType, selectedStatus, search);
     };
 
     const handleSearch = () => {
-        filterRows(roomType, status, search); // Lọc dữ liệu
+        filterRows(roomType, status, search); 
     };
 
     // Hàm lọc dữ liệu
@@ -183,8 +167,8 @@ const Room = () => {
             return roomTypeMatch && statusMatch && nameMatch;
         });
 
-        setFilteredRows(filteredRows); // Cập nhật dữ liệu đã lọc
-        setPage(1); // Reset trang về trang đầu tiên sau khi lọc
+        setFilteredRows(filteredRows);
+        setPage(1); 
     };
 
     // Hàm xử lý xóa phòng
@@ -292,7 +276,7 @@ const Room = () => {
                                 >
                                     {filteredRows.length === 0 && (
                                         <div className="no-data-message">
-                                            Không tìm thấy kết quả tìm kiếm                                            
+                                            Không tìm thấy kết quả tìm kiếm
                                         </div>
                                     )}
                                     <Table
@@ -335,7 +319,10 @@ const Room = () => {
                                                         <TableCell className="tableCell">
                                                             <div className="cellWrapper">
                                                                 <img
-                                                                    src={room.img || "/assets/person/no-image.png"}
+                                                                    src={
+                                                                        room.img ||
+                                                                        "/assets/person/no-image.png"
+                                                                    }
                                                                     alt=""
                                                                     className="image"
                                                                 />
@@ -347,11 +334,11 @@ const Room = () => {
                                                         </TableCell>
 
                                                         <TableCell className="tableCell type-room">
-                                                            {findRoomType(room.typeId)}                                                  
+                                                            {findRoomType(room.typeId)}
                                                         </TableCell>
 
                                                         <TableCell className="tableCell">
-                                                        <span
+                                                            <span
                                                                 className={`status ${getStatusClassName(
                                                                     room.status
                                                                 )}`}

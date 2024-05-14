@@ -61,11 +61,11 @@ export async function getAccountById(accountId) {
     }
 }
 
-// export async function searchAccount(page, searchValue) {
-//     try {
-//         const result = await api.get(`/accounts?page=${page}&searchValue=${searchValue}`);
-//         return result.data;
-//     } catch (error) {
-//         throw new Error(`Error searching account ${error.message}`);
-//     }
-// }
+export async function searchAccount(name) {
+    try {
+        const result = await api.get(`/BookingHistory/Search?key=${name}`);
+        return result.data.data;
+    } catch (error) {
+        throw new Error(`Error searching histories: ${error.message}`);
+    }
+}
