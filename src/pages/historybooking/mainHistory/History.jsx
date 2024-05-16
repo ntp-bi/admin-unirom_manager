@@ -31,7 +31,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as api from "../../../components/api/ApiHistories";
+import * as api from "../../../api/ApiHistories";
 
 import "./main-history.scss";
 

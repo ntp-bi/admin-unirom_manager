@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { addType } from "../../../components/api/ApiTypeRoom";
+import { addType } from "../../../api/ApiTypeRoom";
 import "./add-type.scss";
 
 const AddTypeRoom = () => {

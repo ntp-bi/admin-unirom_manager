@@ -20,7 +20,7 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
-import * as api from "../../../components/api/ApiAccount"
+import * as api from "../../../api/ApiAccount"
 
 import "./main-account.scss";
 
@@ -228,9 +228,9 @@ const Account = () => {
                                                     page * rowsPerPage
                                                 )
                                                 .map((account) => (
-                                                    <TableRow key={account.accountId}>
+                                                    <TableRow key={account.id}>
                                                          <TableCell className="tableCell id-account">
-                                                            {account.accountId}
+                                                            {account.id}
                                                         </TableCell>
                                                         <TableCell className="tableCell name-account">
                                                             {account.userName}
@@ -242,13 +242,13 @@ const Account = () => {
                                                             <button
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
-                                                                    handleDelete(account.accountId)
+                                                                    handleDelete(account.id)
                                                                 }
                                                             >
                                                                 Xóa
                                                             </button>
                                                             <Link
-                                                                to={`/accounts/update-account/${account.accountId}`}
+                                                                to={`/accounts/update-account/${account.id}`}
                                                                 className="btn"
                                                             >
                                                                 <button className="updateBtn">

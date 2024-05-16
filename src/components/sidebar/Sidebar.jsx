@@ -29,7 +29,7 @@ const Sidebar = () => {
     return (
         <div className={closeMenu === false ? "sidebar" : "sidebar active"}>
             <div className="top">
-                <Link to="/" style={{ textDecoration: "none" }}>
+                <Link to="/admin" style={{ textDecoration: "none" }}>
                     <span className="logo">UniRoomManager</span>
                 </Link>
                 <div className="menu__icon" onClick={handleCloseMenu}>
@@ -40,9 +40,9 @@ const Sidebar = () => {
             <hr />
             <div className="bottom">
                 <ul>
-                    <Link to="/" style={{ textDecoration: "none" }}>
+                    <Link to="/admin" style={{ textDecoration: "none" }}>
                         <h4 className="title">BẢNG ĐIỀU KHIỂN</h4>
-                        <li className={location.pathname === "/" ? "active" : ""}>
+                        <li className={location.pathname === "/admin" ? "active" : ""}>
                             <DashboardIcon className="icon" />
                             <span>Bảng điều khiển</span>
                         </li>

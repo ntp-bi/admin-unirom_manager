@@ -16,7 +16,9 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
-import * as api from "../../../components/api/ApiTeacher";
+import * as api from "../../../api/ApiTeacher";
+
+import { baseIMG } from "../../../api/apiConfig";
 
 import "./main-teacher.scss";
 
@@ -67,10 +69,10 @@ const Teacher = () => {
         const fetchApi = async () => {
             setLoadingSearch(true); // Đang tải dữ liệu
 
-          //  const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
+            //  const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
             setLoadingSearch(false); // Kết thúc tải dữ liệu
-           // return result; // Trả về kết quả
+            // return result; // Trả về kết quả
         };
 
         // Kiểm tra xem từ khóa tìm kiếm có thay đổi và không phải là chuỗi rỗng
@@ -122,13 +124,12 @@ const Teacher = () => {
         );
         if (confirmed) {
             try {
-                const result = await api.deleteTeacher(teacherId); // Gọi API xóa phòng
+                const result = await api.deleteTeacher(teacherId); 
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa phòng thành công)
                     toast.success(`Giáo viên ${teacherId} đã được xóa thành công!`);
                     fetchTeachers();
-                } else {
-                    // Nếu kết quả trả về rỗng (có lỗi xảy ra)
+                } else {                    
                     toast.error(`Có lỗi khi xóa giáo viên.`);
                 }
             } catch (error) {
@@ -182,13 +183,13 @@ const Teacher = () => {
                         </Link>
                     </div>
                     {isLoading ? (
-                        <p style={{padding: "20px"}}>Đang tải dữ liệu...</p>
+                        <p style={{ padding: "20px" }}>Đang tải dữ liệu...</p>
                     ) : (
                         <>
                             <div className="top">
                                 {filteredRows.length === 0 && (
                                     <div className="no-data-message">
-                                        Không tìm thấy kết quả tìm kiếm.                                        
+                                        Không tìm thấy kết quả tìm kiếm.
                                     </div>
                                 )}
                                 {filteredRows
@@ -221,7 +222,7 @@ const Teacher = () => {
 
                                             <div className="item">
                                                 <img
-                                                    src={teacher.img || "/assets/person/no-image.png"}
+                                                    src={`${baseIMG}/${teacher.img}`}
                                                     alt=""
                                                     className="itemImg"
                                                 />
@@ -234,12 +235,7 @@ const Teacher = () => {
                                                             Ngày sinh:{" "}
                                                         </span>
                                                         <span className="itemValue">
-                                                            {format(
-                                                                new Date(
-                                                                    teacher.birthday
-                                                                ),
-                                                                "dd/MM/yyyy"
-                                                            )}
+                                                            {teacher.birthDay}
                                                         </span>
                                                     </div>
                                                     <div className="detailItem">
@@ -247,7 +243,9 @@ const Teacher = () => {
                                                             Giới tính:{" "}
                                                         </span>
                                                         <span className="itemValue">
-                                                            {teacher.gentle}
+                                                            {teacher.gender
+                                                                ? "Nam"
+                                                                : "Nữ"}
                                                         </span>
                                                     </div>
                                                     <div className="detailItem">
@@ -255,7 +253,7 @@ const Teacher = () => {
                                                             Email:{" "}
                                                         </span>
                                                         <span className="itemValue">
-                                                            {teacher.email}
+                                                            {teacher.accountName}
                                                         </span>
                                                     </div>
                                                 </div>

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { getTypeById, updateType } from "../../../components/api/ApiTypeRoom";
+import { getTypeById, updateType } from "../../../api/ApiTypeRoom";
 
 const UpdateTypeRoom = () => {
     const { typeId } = useParams();
@@ -61,7 +61,7 @@ const UpdateTypeRoom = () => {
         try {
             const response = await updateType(typeId, type);
 
-            if (response.status === 200) {
+            if (response === true) {
                 toast.success("Cập nhật loại phòng thành công!");
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật loại phòng!");

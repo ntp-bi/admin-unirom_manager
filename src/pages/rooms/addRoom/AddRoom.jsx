@@ -2,33 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { addRoom } from "../../../components/api/ApiRoom";
-import { getAllType } from "../../../components/api/ApiTypeRoom";
-import { getAllRooms } from "../../../components/api/ApiRoom";
-
+import { addRoom } from "../../../api/ApiRoom";
+import { getAllType } from "../../../api/ApiTypeRoom";
 
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
+
 import "./add-room.scss";
 
 const AddRoom = () => {
     const [newRoom, setNewRoom] = useState({
-        img: null,
-        nameRoom: "",
+        file: null,
+        roomname: "",
         area: "",
-        countOfSeat: "",
+        countofseats: "",
         description: "",
-        typeId: "",
-        typeName: ""
+        status: 1,
+        typeid: "",
     });
 
     const [imagePreview, setImagePreview] = useState("");
     const [roomTypes, setRoomTypes] = useState([]);
     const [errors, setErrors] = useState({
-        nameRoom: "",
+        roomname: "",
         area: "",
-        countOfSeat: "",
-        typeName: "",
+        countofseats: "",
+        typeid: "",
     });
 
     useEffect(() => {
@@ -41,7 +40,7 @@ const AddRoom = () => {
             }
         };
         fetchRoomTypes();
-    }, []);   
+    }, []);
 
     const handleRoomInputChange = (e) => {
         const { name, value } = e.target;
@@ -49,32 +48,19 @@ const AddRoom = () => {
     };
 
     const handleRoomTypeChange = (e) => {
-        const selectedRoomType = e.target.value;
-        const selectedType = roomTypes.find((type) => type.typeName === selectedRoomType);
-
-        if (selectedType) {
-            setNewRoom({
-                ...newRoom,
-                typeId: selectedType.typeId,
-                typeName: selectedRoomType, // Sử dụng roomType thay vì typeName
-            });
-
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                roomType: "", // Xóa thông báo lỗi khi người dùng chọn một loại phòng mới
-            }));
-        }
+        const selectedTypeId = e.target.value;
+        setNewRoom({ ...newRoom, typeid: selectedTypeId });
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        if (selectedImage instanceof File) {
+        const file = e.target.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                setNewRoom((prevRoom) => ({ ...prevRoom, img: reader.result }));
                 setImagePreview(reader.result);
             };
-            reader.readAsDataURL(selectedImage);
+            reader.readAsDataURL(file);
+            setNewRoom({ ...newRoom, file: file });
         }
     };
 
@@ -84,11 +70,11 @@ const AddRoom = () => {
         let hasErrors = false;
         const newErrors = { ...errors };
 
-        if (!newRoom.nameRoom) {
-            newErrors.nameRoom = "Vui lòng nhập tên phòng.";
+        if (!newRoom.roomname) {
+            newErrors.roomname = "Vui lòng nhập tên phòng.";
             hasErrors = true;
         } else {
-            newErrors.nameRoom = "";
+            newErrors.roomname = "";
         }
 
         if (!newRoom.area || newRoom.area <= 0) {
@@ -98,18 +84,18 @@ const AddRoom = () => {
             newErrors.area = "";
         }
 
-        if (!newRoom.countOfSeat || newRoom.countOfSeat <= 0) {
-            newErrors.countOfSeat = "Số lượng chỗ ngồi phải lớn hơn 0.";
+        if (!newRoom.countofseats || newRoom.countofseats <= 0) {
+            newErrors.countofseats = "Số lượng chỗ ngồi phải lớn hơn 0.";
             hasErrors = true;
         } else {
-            newErrors.countOfSeat = "";
+            newErrors.countofseats = "";
         }
 
-        if (!newRoom.typeId) {
-            newErrors.typeName = "Vui lòng chọn loại phòng.";
+        if (!newRoom.typeid) {
+            newErrors.typeid = "Vui lòng chọn loại phòng.";
             hasErrors = true;
         } else {
-            newErrors.typeName = "";
+            newErrors.typeid = "";
         }
 
         if (hasErrors) {
@@ -119,31 +105,30 @@ const AddRoom = () => {
 
         try {
             await addRoom(
-                newRoom.img,
-                newRoom.nameRoom,
+                newRoom.file,
+                newRoom.roomname,
                 newRoom.area,
-                newRoom.countOfSeat,
+                newRoom.countofseats,
                 newRoom.description,
-                1,
-                newRoom.typeId,
-                newRoom.typeName
+                newRoom.status,
+                newRoom.typeid
             );
             toast.success("Phòng đã được thêm vào cơ sở dữ liệu");
             setNewRoom({
-                img: null,
-                nameRoom: "",
+                file: null,
+                roomname: "",
                 area: "",
-                countOfSeat: "",
+                countofseats: "",
                 description: "",
-                typeName: "",
+                status: 1,
+                typeid: "",
             });
             setImagePreview("");
-
             setErrors({
-                nameRoom: "",
+                roomname: "",
                 area: "",
-                countOfSeat: "",
-                typeName: "",
+                countofseats: "",
+                typeid: "",
             });
         } catch (error) {
             toast.error(error.message);
@@ -181,7 +166,7 @@ const AddRoom = () => {
                                 <div className="formInput input-image">
                                     <input
                                         id="img"
-                                        name="img"
+                                        name="file"
                                         type="file"
                                         className="form-control file"
                                         onChange={handleImageChange}
@@ -194,13 +179,13 @@ const AddRoom = () => {
                                     <input
                                         type="text"
                                         placeholder="Nhập tên phòng"
-                                        name="nameRoom"
-                                        value={newRoom.nameRoom}
+                                        name="roomname"
+                                        value={newRoom.roomname}
                                         onChange={handleRoomInputChange}
-                                        onFocus={() => handleInputFocus("nameRoom")}
+                                        onFocus={() => handleInputFocus("roomname")}
                                     />
-                                    {errors.nameRoom && (
-                                        <div className="error">{errors.nameRoom}</div>
+                                    {errors.roomname && (
+                                        <div className="error">{errors.roomname}</div>
                                     )}
                                 </div>
 
@@ -209,22 +194,19 @@ const AddRoom = () => {
                                     <select
                                         className="select"
                                         onChange={handleRoomTypeChange}
-                                        name="typeName" 
-                                        value={newRoom.typeName}
-                                        onFocus={() => handleInputFocus("typeName")}
+                                        name="typeid"
+                                        value={newRoom.typeid}
+                                        onFocus={() => handleInputFocus("typeid")}
                                     >
-                                        <option>-- Chọn loại phòng --</option>
+                                        <option value="">-- Chọn loại phòng --</option>
                                         {roomTypes.map((type) => (
-                                            <option
-                                                key={type.typeId}
-                                                value={type.typeName} 
-                                            >
+                                            <option key={type.id} value={type.id}>
                                                 {type.typeName}
                                             </option>
                                         ))}
                                     </select>
-                                    {errors.typeName && (
-                                        <div className="error">{errors.typeName}</div>
+                                    {errors.typeid && (
+                                        <div className="error">{errors.typeid}</div>
                                     )}
                                 </div>
                                 <div className="formInput">
@@ -246,13 +228,13 @@ const AddRoom = () => {
                                     <input
                                         type="number"
                                         placeholder="Nhập số lượng chỗ ngồi"
-                                        name="countOfSeat"
-                                        value={newRoom.countOfSeat}
+                                        name="countofseats"
+                                        value={newRoom.countofseats}
                                         onChange={handleRoomInputChange}
-                                        onFocus={() => handleInputFocus("countOfSeat")}
+                                        onFocus={() => handleInputFocus("countofseats")}
                                     />
-                                    {errors.countOfSeat && (
-                                        <div className="error">{errors.countOfSeat}</div>
+                                    {errors.countofseats && (
+                                        <div className="error">{errors.countofseats}</div>
                                     )}
                                 </div>
                                 <div className="formArea">

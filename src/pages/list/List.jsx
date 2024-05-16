@@ -15,7 +15,9 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
 import useDebounce from "../../components/hooks/useDebounce";
-import * as api from "../../components/api/ApiList.jsx";
+import * as api from "../../api/ApiList.js";
+
+import { baseIMG } from "../../api/apiConfig.js";
 
 import "./list.scss";
 
@@ -131,18 +133,14 @@ const List = () => {
     };
 
     // Hàm xử lý khi nhấn nút xác nhận đặt phòng
-    const handleConfirm = async (listId) => {
+    const handleConfirm = async (detailId) => {
         try {
-            const success = await api.confirmReservation(listId);
+            const success = await api.confirmReservation(detailId);
             if (success) {
                 toast.success("Xác nhận đặt phòng thành công!");
-                // Cập nhật trạng thái đặt phòng trong danh sách
-                const updatedLists = lists.map((item) =>
-                    item.listId === listId ? { ...item, status: 2 } : item
-                );
-                setLists(updatedLists);
-                setFilteredRows(updatedLists);
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 toast.error("Xác nhận đặt phòng thất bại!");
             }
@@ -152,18 +150,14 @@ const List = () => {
     };
 
     // Hàm xử lý khi nhấn nút từ chối đặt phòng
-    const handleReject = async (listId) => {
+    const handleReject = async (detailId) => {
         try {
-            const success = await api.rejectReservation(listId);
+            const success = await api.rejectReservation(detailId);
             if (success) {
                 toast.success("Từ chối đặt phòng thành công!");
-                // Cập nhật trạng thái đặt phòng trong danh sách
-                const updatedLists = lists.map((item) =>
-                    item.listId === listId ? { ...item, status: 5 } : item
-                );
-                setLists(updatedLists);
-                setFilteredRows(updatedLists);
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 toast.error("Từ chối đặt phòng thất bại!");
             }
@@ -262,12 +256,12 @@ const List = () => {
                                                     page * rowsPerPage
                                                 )
                                                 .map((list) => (
-                                                    <TableRow key={list.id}>
+                                                    <TableRow key={list.detailId}>
                                                         <TableCell className="tableCell">
                                                             <div className="cellWrapper">
                                                                 <img
                                                                     className="image"
-                                                                    src={list.photo}
+                                                                    src={`${baseIMG}/${list.roomPhoto}`}
                                                                     alt=""
                                                                 />
                                                             </div>
@@ -276,7 +270,7 @@ const List = () => {
                                                             {list.roomName}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
-                                                            {list.fullName}
+                                                            {list.userName}
                                                         </TableCell>
                                                         <TableCell className="tableCell">
                                                             {list.eventName}
@@ -304,7 +298,9 @@ const List = () => {
                                                             <button
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
-                                                                    handleReject(list.id)
+                                                                    handleReject(
+                                                                        list.detailId
+                                                                    )
                                                                 }
                                                             >
                                                                 Từ chối
@@ -312,7 +308,9 @@ const List = () => {
                                                             <button
                                                                 className="updateBtn btn"
                                                                 onClick={() =>
-                                                                    handleConfirm(list.id)
+                                                                    handleConfirm(
+                                                                        list.detailId
+                                                                    )
                                                                 }
                                                             >
                                                                 Xác nhận

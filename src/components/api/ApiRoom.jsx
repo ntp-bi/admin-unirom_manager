@@ -35,7 +35,13 @@ export async function addRoom(
 // This function gets all rooms from the database
 export async function getAllRooms() {
     try {
-        const result = await api.get("/getallroom");
+        const token = localStorage.getItem("token");
+        const result = await api.get("/getallroom", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
         return result.data.data;
     } catch (error) {
         throw new Error("Error fetching rooms");

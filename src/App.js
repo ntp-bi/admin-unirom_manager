@@ -24,7 +24,6 @@ import UpdateEvent from "./pages/events/updateEvent/UpdateEvent.jsx";
 import Teacher from "./pages/teachers/mainTeacher/Teacher.jsx";
 import AddTeacher from "./pages/teachers/addTeacher/AddTeacher.jsx";
 import UpdateTeacher from "./pages/teachers/updateTeacher/UpdateTeacher.jsx";
-import DetailTeacher from "./pages/teachers/detailTeacher/DetailTeacher.jsx";
 
 // import Accounts
 import Account from "./pages/accounts/mainAccount/Account.jsx";
@@ -33,10 +32,10 @@ import UpdateAccount from "./pages/accounts/updateAccount/UpdateAccount.jsx";
 
 // import History
 import History from "./pages/historybooking/mainHistory/History.jsx";
-import DetailHistory from "./pages/historybooking/detailHistory/DetailHistory.jsx"
+import DetailHistory from "./pages/historybooking/detailHistory/DetailHistory.jsx";
 
 // import Report
-import Report from "./pages/reports/mainRReport/Report.jsx"
+import Report from "./pages/reports/mainRReport/Report.jsx";
 
 import { DarkModeContext } from "./context/darkModeContext";
 
@@ -44,7 +43,7 @@ import "./style/dark.scss";
 
 const router = createBrowserRouter([
     {
-        path: "/",
+        path: "/admin",
         element: <Home />,
     },
     // ROOMS START
@@ -109,10 +108,7 @@ const router = createBrowserRouter([
         path: "/teachers/update-teacher/:teacherId",
         element: <UpdateTeacher />,
     },
-    {
-        path: "/teachers/detail-teacher/:teacherId",
-        element: <DetailTeacher />,
-    },
+
     // TEACHER END
 
     // ACCOUNT START
@@ -127,14 +123,14 @@ const router = createBrowserRouter([
     {
         path: "/accounts/update-account/:accountId",
         element: <UpdateAccount />,
-    },   
+    },
     // ACCOUNT END
 
     // HISTORY START
     {
         path: "/histories",
         element: <History />,
-    },   
+    },
     {
         path: "/histories/detail-history/:historyId",
         element: <DetailHistory />,

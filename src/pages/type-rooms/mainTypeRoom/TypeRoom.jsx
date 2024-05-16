@@ -20,7 +20,7 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 import useDebounce from "../../../components/hooks/useDebounce";
 
-import * as api from "../../../components/api/ApiTypeRoom";
+import * as api from "../../../api/ApiTypeRoom";
 
 import "./main-type.scss";
 
@@ -225,9 +225,9 @@ const TypeRoom = () => {
                                                     page * rowsPerPage
                                                 )
                                                 .map((type) => (
-                                                    <TableRow key={type.typeId}>
+                                                    <TableRow key={type.id}>
                                                          <TableCell className="tableCell id-type">
-                                                            {type.typeId}
+                                                            {type.id}
                                                         </TableCell>
                                                         <TableCell className="tableCell name-type">
                                                             {type.typeName}
@@ -236,13 +236,13 @@ const TypeRoom = () => {
                                                             <button
                                                                 className="deleteBtn btn"
                                                                 onClick={() =>
-                                                                    handleDelete(type.typeId)
+                                                                    handleDelete(type.id)
                                                                 }
                                                             >
                                                                 Xóa
                                                             </button>
                                                             <Link
-                                                                to={`/types/update-type/${type.typeId}`}
+                                                                to={`/types/update-type/${type.id}`}
                                                                 className="btn"
                                                             >
                                                                 <button className="updateBtn">

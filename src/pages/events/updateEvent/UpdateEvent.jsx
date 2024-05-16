@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { getEventById, updateEvent } from "../../../components/api/ApiEvent";
+import { getEventById, updateEvent } from "../../../api/ApiEvents";
 
 const UpdateEvent = () => {
     const { eventId } = useParams();
@@ -61,7 +61,7 @@ const UpdateEvent = () => {
         try {
             const response = await updateEvent(eventId, event);
             
-            if (response.status === 200) {
+            if (response === true) {
                 toast.success("Cập nhật loại phòng thành công!");
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật loại phòng!");

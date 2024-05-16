@@ -19,8 +19,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as api from "../../../components/api/ApiRoom";
-import * as typeApi from "../../../components/api/ApiTypeRoom";
+import * as api from "../../../api/ApiRoom";
+import * as typeApi from "../../../api/ApiTypeRoom";
+import {baseIMG} from '../../../api/apiConfig'
 
 import "./room.scss";
 
@@ -37,7 +38,7 @@ const Room = () => {
     const [page, setPage] = useState(1);
     const rowsPerPage = 7;
 
-    const debouncedValue = useDebounce(search, 500); 
+    const debouncedValue = useDebounce(search, 500);
 
     const inputRef = useRef(); // Tham chiếu đến input tìm kiếm
 
@@ -60,7 +61,7 @@ const Room = () => {
             default:
                 return "";
         }
-    };    
+    };
 
     useEffect(() => {
         fetchRooms();
@@ -90,26 +91,13 @@ const Room = () => {
         }
     };
 
-    // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
-    const findRoomType = (typeId) => {
-        const roomType = roomTypes.find(
-            (type) => parseInt(type.typeId) === parseInt(typeId)
-        );
-        // Kiểm tra xem roomType có tồn tại không
-        if (roomType) {
-            return roomType.typeName;
-        } else {
-            return "Unknown";
-        }
-    };
-
     // Hàm xử lý tìm kiếm khi có sự thay đổi trong từ khóa tìm kiếm
     useEffect(() => {
         const fetchApi = async () => {
             setLoadingSearch(true);
             //  const result = await searchServices.search(debouncedValue); // Gọi API tìm kiếm
 
-            setLoadingSearch(false); 
+            setLoadingSearch(false);
             //  return result;
         };
 
@@ -120,39 +108,39 @@ const Room = () => {
 
     // Xử lý sự kiện khi người dùng xóa từ khóa tìm kiếm
     const handleClear = () => {
-        setSearch(""); 
-        inputRef.current.focus(); 
-        setFilteredRows(rooms); 
+        setSearch("");
+        inputRef.current.focus();
+        setFilteredRows(rooms);
     };
 
     // Xử lý sự kiện khi người dùng thay đổi từ khóa tìm kiếm
     const handleSearchChange = (event) => {
         const searchValue = event.target.value;
         if (!searchValue.startsWith(" ")) {
-            setSearch(searchValue); 
+            setSearch(searchValue);
         }
     };
 
     // Xử lý sự kiện khi người dùng thay đổi trang
     const handleChangePage = (event, newPage) => {
-        setPage(newPage); 
+        setPage(newPage);
     };
 
     // Xử lý sự kiện khi người dùng thay đổi loại phòng
     const handleRoomTypeChange = (event) => {
-        setRoomType(event.target.value); 
+        setRoomType(event.target.value);
         filterRows(event.target.value, status, search); // Lọc dữ liệu
     };
 
     // Xử lý sự kiện khi người dùng thay đổi trạng thái
     const handleStatusChange = (event) => {
-        const selectedStatus = parseInt(event.target.value); 
+        const selectedStatus = parseInt(event.target.value);
         setStatus(selectedStatus);
         filterRows(roomType, selectedStatus, search);
     };
 
     const handleSearch = () => {
-        filterRows(roomType, status, search); 
+        filterRows(roomType, status, search);
     };
 
     // Hàm lọc dữ liệu
@@ -168,18 +156,18 @@ const Room = () => {
         });
 
         setFilteredRows(filteredRows);
-        setPage(1); 
+        setPage(1);
     };
 
     // Hàm xử lý xóa phòng
-    const handleDelete = async (roomId) => {
+    const handleDelete = async (id) => {
         const confirmed = window.confirm("Bạn có chắc chắn muốn xóa phòng này không?");
         if (confirmed) {
             try {
-                const result = await api.deleteRoom(roomId); // Gọi API xóa phòng
+                const result = await api.deleteRoom(id); // Gọi API xóa phòng
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa phòng thành công)
-                    toast.success(`Phòng ${roomId} đã được xóa thành công!`);
+                    toast.success(`Phòng đã được xóa thành công!`);
                     fetchRooms();
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)
@@ -319,22 +307,19 @@ const Room = () => {
                                                         <TableCell className="tableCell">
                                                             <div className="cellWrapper">
                                                                 <img
-                                                                    src={
-                                                                        room.img ||
-                                                                        "/assets/person/no-image.png"
-                                                                    }
+                                                                    src={`${baseIMG}/${room.image}`}
                                                                     alt=""
                                                                     className="image"
-                                                                />
+                                                                />                                                               
                                                                 {room.product}
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="tableCell name-room">
-                                                            {room.nameRoom}
+                                                            {room.roomName}
                                                         </TableCell>
 
                                                         <TableCell className="tableCell type-room">
-                                                            {findRoomType(room.typeId)}
+                                                            {room.typeName}
                                                         </TableCell>
 
                                                         <TableCell className="tableCell">

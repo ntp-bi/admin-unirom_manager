@@ -6,8 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { addAccount } from "../../../components/api/ApiAccount";
-import { getAllTeachers } from "../../../components/api/ApiTeacher";
+import { addAccount, getAllRole } from "../../../api/ApiAccount";
+import { getAllTeachers } from "../../../api/ApiTeacher";
 
 import "./add-account.scss";
 
@@ -15,16 +15,17 @@ const AddEvent = () => {
     const [newAccount, setNewAccount] = useState({
         userName: "",
         password: "",
-        id: "",
-        fullName: "",
+        userId: "",
+        roleId: "",
+        roleName: "",
     });
 
     const [accountTeachers, setAccountTeachers] = useState([]);
+    const [accountRoles, setAccountRoles] = useState([]);
 
     const [errors, setErrors] = useState({
         userName: "",
         password: "",
-        fullName: "",
     });
 
     useEffect(() => {
@@ -39,6 +40,18 @@ const AddEvent = () => {
         fetchAccountTeacher();
     }, []);
 
+    useEffect(() => {
+        const fetchRoleAccount = async () => {
+            try {
+                const roles = await getAllRole();
+                setAccountRoles(roles);
+            } catch (error) {
+                console.error("Error fetching role:", error);
+            }
+        };
+        fetchRoleAccount();
+    }, []);
+
     const handleAccountInputChange = (e) => {
         const { name, value } = e.target;
         setNewAccount({ ...newAccount, [name]: value });
@@ -47,24 +60,15 @@ const AddEvent = () => {
             ...prevErrors,
         }));
     };
+
     const handleAccountTeacherChange = (e) => {
-        const selectedAccountTeacher = e.target.value;
-        const selectedTeacher = accountTeachers.find(
-            (teacher) => teacher.fullName === selectedAccountTeacher
-        );
+        const selectedUserId = e.target.value;
+        setNewAccount({ ...newAccount, userId: selectedUserId });
+    };
 
-        if (selectedTeacher) {
-            setNewAccount({
-                ...newAccount,
-                id: selectedTeacher.id,
-                fullName: selectedAccountTeacher,
-            });
-
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                fullName: "", // Xóa thông báo lỗi khi người dùng chọn một loại phòng mới
-            }));
-        }
+    const handleAccountRoleChange = (e) => {
+        const selectedRoleId = e.target.value;
+        setNewAccount({ ...newAccount, roleId: selectedRoleId });
     };
 
     const handleSubmit = async (e) => {
@@ -87,11 +91,18 @@ const AddEvent = () => {
             newErrors.password = "";
         }
 
-        if (!newAccount.id) {
-            newErrors.fullName = "Vui lòng chọn giảng viên.";
+        if (!newAccount.userId) {
+            newErrors.userId = "Vui lòng chọn giảng viên.";
             hasErrors = true;
         } else {
-            newErrors.fullName = "";
+            newErrors.userId = "";
+        }
+
+        if (!newAccount.roleId) {
+            newErrors.roleId = "Vui lòng chọn quyền.";
+            hasErrors = true;
+        } else {
+            newErrors.roleId = "";
         }
 
         if (hasErrors) {
@@ -103,16 +114,25 @@ const AddEvent = () => {
             await addAccount(
                 newAccount.userName,
                 newAccount.password,
-                newAccount.id,
-                newAccount.fullName
+                newAccount.userId,
+                newAccount.roleId,
+                newAccount.roleName
             );
             toast.success("Tài khoản đã được thêm thành công!");
-            setNewAccount({ userName: "", password: "", fullName: "" });
+            setNewAccount({
+                userName: "",
+                password: "",
+                userId: "",
+                roleId: "",
+                roleName: "",
+            });
 
             setErrors({
                 userName: "",
                 password: "",
-                fullName: "",
+                userId: "",
+                roleId: "",
+                roleName: "",
             });
         } catch (error) {
             toast.error("Có lỗi xảy ra khi thêm tài khoản!");
@@ -170,20 +190,41 @@ const AddEvent = () => {
                                 <label>Tên giảng viên: </label>
                                 <select
                                     className="select"
-                                    name="fullName"
+                                    name="userId"
                                     onChange={handleAccountTeacherChange}
-                                    value={newAccount.fullName}
-                                    onFocus={() => handleInputFocus("fullName")}
+                                    value={newAccount.userId}
+                                    onFocus={() => handleInputFocus("userId")}
                                 >
                                     <option>-- Chọn giảng viên --</option>
                                     {accountTeachers.map((teacher) => (
-                                        <option key={teacher.id} value={teacher.fullName}>
+                                        <option key={teacher.id} value={teacher.id}>
                                             {teacher.fullName}
                                         </option>
                                     ))}
                                 </select>
-                                {errors.fullName && (
-                                    <div className="error">{errors.fullName}</div>
+                                {errors.userId && (
+                                    <div className="error">{errors.userId}</div>
+                                )}
+                            </div>
+
+                            <div className="formInput">
+                                <label>Quyền: </label>
+                                <select
+                                    className="select"
+                                    name="roleId"
+                                    onChange={handleAccountRoleChange}
+                                    value={newAccount.roleId}
+                                    onFocus={() => handleInputFocus("roleId")}
+                                >
+                                    <option>-- Chọn quyền --</option>
+                                    {accountRoles.map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                            {role.roleName}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.roleId && (
+                                    <div className="error">{errors.roleId}</div>
                                 )}
                             </div>
 

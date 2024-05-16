@@ -7,7 +7,7 @@ import moment from "moment";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import * as api from "../../../components/api/ApiHistories";
+import * as api from "../../../api/ApiHistories";
 import "./detail-history.scss";
 
 const DetailHistory = () => {

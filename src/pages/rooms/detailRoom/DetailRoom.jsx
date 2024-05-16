@@ -6,29 +6,16 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import * as api from "../../../components/api/ApiRoom";
-import * as typeApi from "../../../components/api/ApiTypeRoom";
+import * as api from "../../../api/ApiRoom";
+import * as typeApi from "../../../api/ApiTypeRoom";
+import { baseIMG } from "../../../api/apiConfig";
+
 import "./detail-room.scss";
 
 const DetailRoom = () => {
     const { roomId } = useParams();
     const [room, setRoom] = useState([]);
     const [roomTypes, setRoomTypes] = useState([]);
-
-    // Tạo một hàm để tìm loại phòng dựa trên typeId
-    const findRoomType = (typeId) => {
-        // Tìm kiếm loại phòng trong danh sách roomTypes dựa trên typeId
-        const roomType = roomTypes.find(
-            (type) => parseInt(type.typeId) === parseInt(typeId)
-        );
-
-        // Kiểm tra xem roomType có tồn tại không
-        if (roomType) {
-            return roomType.typeName; // Trả về tên của loại phòng nếu tồn tại
-        } else {
-            return "Unknown"; // Trả về "Unknown" nếu không tìm thấy loại phòng
-        }
-    };
 
     useEffect(() => {
         const fetchRoomTypes = async () => {
@@ -40,7 +27,7 @@ const DetailRoom = () => {
             }
         };
         fetchRoomTypes();
-    },[]);
+    }, []);
 
     useEffect(() => {
         const fetchRoom = async () => {
@@ -70,11 +57,7 @@ const DetailRoom = () => {
                             <div className="left">
                                 <div className="image">
                                     <img
-                                        src={
-                                            room && room.img
-                                                ? room.img
-                                                : "/assets/person/no-image.png"
-                                        }
+                                        src={`${baseIMG}/${room.image}`}
                                         alt=""
                                         className="image"
                                     />
@@ -86,7 +69,7 @@ const DetailRoom = () => {
                                         <label>
                                             Tên phòng:
                                             <span className="info name-room">
-                                                {room.nameRoom}
+                                                {room.roomName}
                                             </span>
                                         </label>
                                     </div>
@@ -94,7 +77,7 @@ const DetailRoom = () => {
                                         <label>
                                             Loại phòng:
                                             <span className="info type-room">
-                                                {findRoomType(room.typeId)}
+                                                {room.typeName}
                                             </span>
                                         </label>
                                     </div>
@@ -110,7 +93,7 @@ const DetailRoom = () => {
                                         <label>
                                             Số lượng chỗ ngồi:
                                             <span className="info count-seat">
-                                                {room.countOfSeat}
+                                                {room.countOfSeats}
                                             </span>
                                         </label>
                                     </div>

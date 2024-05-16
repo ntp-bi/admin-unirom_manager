@@ -10,7 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { fetchReportsByDate, exportExcelByYear } from "../../../components/api/ApiReport";
+import { fetchReportsByDate, exportExcelByYear } from "../../../api/ApiReport";
 
 import "./main-report.scss";
 
@@ -181,10 +181,7 @@ const Report = () => {
                                         aria-label="simple table"
                                     >
                                         <TableHead>
-                                            <TableRow>
-                                                <TableCell className="tableCell tabble-header">
-                                                    Ngày
-                                                </TableCell>
+                                            <TableRow>                                                
                                                 <TableCell className="tableCell tabble-header">
                                                     Số lượng đặt phòng
                                                 </TableCell>
@@ -204,10 +201,7 @@ const Report = () => {
                                         </TableHead>
                                         <TableBody>
                                             {reports.map((report, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell className="tableCell">
-                                                        {`${report.day}/${report.month}/${report.year}`}
-                                                    </TableCell>
+                                                <TableRow key={index}>                                                   
                                                     <TableCell className="tableCell">
                                                         {report.countOfBookingRoom}
                                                     </TableCell>

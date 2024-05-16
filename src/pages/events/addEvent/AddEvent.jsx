@@ -6,19 +6,22 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { addEvent } from "../../../components/api/ApiEvent";
+import { addEvent } from "../../../api/ApiEvents";
 
 import "./add-event.scss";
 
 const AddEvent = () => {
-    const [eventName, setEventName] = useState("");
+    const [eventName, setEventName] = useState({
+        eventName: "",
+    });
 
     const [errors, setErrors] = useState({
         eventName: "",
     });
 
     const handleEventInputChange = (e) => {
-        setEventName(e.target.value);
+        const { name, value } = e.target;
+        setEventName({ ...eventName, [name]: value });
 
         setErrors((prevErrors) => ({
             ...prevErrors,
@@ -44,9 +47,9 @@ const AddEvent = () => {
         }
 
         try {
-            await addEvent(eventName);
+            await addEvent(eventName.eventName);
             toast.success("Sự kiện đã được thêm thành công!");
-            setEventName("");
+            setEventName({eventName: ""});
         } catch (error) {
             toast.error("Có lỗi xảy ra khi thêm sự kiện!");
             console.error("Error adding event:", error);
@@ -75,8 +78,9 @@ const AddEvent = () => {
                                 <label>Tên sự kiện:</label>
                                 <input
                                     type="text"
+                                    name="eventName"
                                     placeholder="Nhập tên sự kiện"
-                                    value={eventName}
+                                    value={eventName.eventName}
                                     onChange={handleEventInputChange}
                                     onFocus={() => handleInputFocus("eventName")}
                                 />

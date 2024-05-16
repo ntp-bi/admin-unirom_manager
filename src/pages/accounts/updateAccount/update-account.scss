@@ -66,33 +66,34 @@
                         bottom: -20px;
 
                         .back {
-                            color: goldenrod;
-                            border: 1px dotted goldenrod;
-                            margin-right: 10px;
+                            color: #333;
+                            background-color: #f4f4f4;
+                            border: 1px dotted #bbbb;
                             transition: background-color 0.3s linear;
 
                             &:hover {
-                                background-color: #e0e5ae;
+                                background-color: #e7e7e7;
                             }
                         }
                     }
 
                     button {
-                        color: #31b0d5;
+                        color: #fff;
                         font-size: 16px;
                         font-weight: 600;
-                        border: 1px dotted #31b0d5;
+                        border: 1px dotted #fff;
                         padding: 5px;
                         width: 100px;
                         border-radius: 5px;
                         cursor: pointer;
-                        margin-left: 33px;
+                        margin-left: 20px;
+                        background-color: #3c8dbc;
                         transition: background-color 0.3s linear;
 
                         &:hover {
-                            background-color: #d2edf9;
+                            background-color: #367fa9;
                         }
-                    }                    
+                    }              
                 }
             }
         }

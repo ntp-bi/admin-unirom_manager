@@ -20,7 +20,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RotateRightOutlinedIcon from "@mui/icons-material/RotateRightOutlined";
 
-import * as api from "../../../components/api/ApiEvent";
+import * as api from "../../../api/ApiEvents";
 
 import "./event.scss";
 
@@ -125,7 +125,7 @@ const Event = () => {
                 const result = await api.deleteEvent(eventId); // Gọi API xóa sự kiện
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa sự kiện thành công)
-                    toast.success(`Sự kiện ${eventId} đã được xóa thành công!`);
+                    toast.success(`Sự kiện đã được xóa thành công!`);
                     fetchRooms();
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)

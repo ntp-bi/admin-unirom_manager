@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { addTeacher } from "../../../components/api/ApiTeacher";
+import { addTeacher } from "../../../api/ApiTeacher";
 import "./add-teacher.scss";
 
 const AddTeacher = () => {
@@ -13,17 +13,15 @@ const AddTeacher = () => {
 
     const [newTeacher, setNewTeacher] = useState({
         fullName: "",
-        birthday: defaultBirthday,
-        img: null,
-        gentle: "Nam",
-        email: "",
+        birthDay: defaultBirthday,
+        gender: true,
+        photo: null,
     });
     const [imagePreview, setImagePreview] = useState("");
 
     const [errors, setErrors] = useState({
-        fullName: "",       
-        email: "",
-    });    
+        fullName: "",
+    });
 
     const handleTeacherInputChange = (e) => {
         const { name, value } = e.target;
@@ -31,23 +29,19 @@ const AddTeacher = () => {
 
         setErrors((prevErrors) => ({
             ...prevErrors,
+            [name]: "",
         }));
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        // Kiểm tra xem selectedImage có tồn tại không và có phải là đối tượng File không
-        if (selectedImage instanceof File) {
-            // Tạo một đối tượng FileReader để đọc dữ liệu của tệp hình ảnh
+        const file = e.target.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                // Khi FileReader đọc xong, gán dữ liệu hình ảnh vào thuộc tính img của newRoom
-                setNewTeacher((prevTeacher) => ({ ...prevTeacher, img: reader.result }));
-                // Hiển thị xem trước hình ảnh
                 setImagePreview(reader.result);
             };
-            // Bắt đầu đọc dữ liệu của tệp hình ảnh
-            reader.readAsDataURL(selectedImage);
+            reader.readAsDataURL(file);
+            setNewTeacher({ ...newTeacher, photo: file });
         }
     };
 
@@ -62,20 +56,8 @@ const AddTeacher = () => {
             hasErrors = true;
         } else {
             newErrors.fullName = "";
-        }       
-
-        const emailRegex = /^\S+@\S+\.\S+$/;
-        if (!newTeacher.email) {
-            newErrors.email = "Vui lòng nhập email.";
-            hasErrors = true;
-        } else if (!emailRegex.test(newTeacher.email)) {
-            newErrors.email = "Email không hợp lệ.";
-            hasErrors = true;
-        } else {
-            newErrors.email = "";
         }
 
-        // Set error state và ngừng submit nếu có lỗi
         if (hasErrors) {
             setErrors(newErrors);
             return;
@@ -84,18 +66,16 @@ const AddTeacher = () => {
         try {
             await addTeacher(
                 newTeacher.fullName,
-                newTeacher.birthday,
-                newTeacher.img,
-                newTeacher.gentle,
-                newTeacher.email
+                newTeacher.birthDay,
+                newTeacher.photo,
+                newTeacher.gender
             );
-            toast.success("Phòng đã được thêm vào cơ sở dữ liệu");
+            toast.success("Giảng viên đã được thêm vào cơ sở dữ liệu");
             setNewTeacher({
                 fullName: "",
-                birthday: "",
-                img: null,
-                gentle: "",
-                email: "",
+                birthDay: defaultBirthday,
+                photo: null,
+                gender: true,
             });
             setImagePreview("");
         } catch (error) {
@@ -133,7 +113,7 @@ const AddTeacher = () => {
                             <div className="formInput input-image">
                                 <input
                                     id="img"
-                                    name="img"
+                                    name="photo"
                                     type="file"
                                     className="form-control file"
                                     onChange={handleImageChange}
@@ -161,18 +141,18 @@ const AddTeacher = () => {
                                 <input
                                     className="input-radio"
                                     type="radio"
-                                    value="Nam"
-                                    name="gentle"
-                                    checked={newTeacher.gentle === "Nam"}
+                                    value={true}
+                                    name="gender"
+                                    checked={newTeacher.gender === true}
                                     onChange={handleTeacherInputChange}
                                 />{" "}
                                 Nam
                                 <input
                                     className="input-radio"
                                     type="radio"
-                                    value="Nữ"
-                                    name="gentle"
-                                    checked={newTeacher.gentle === "Nữ"}
+                                    value={false}
+                                    name="gender"
+                                    checked={newTeacher.gender === false}
                                     onChange={handleTeacherInputChange}
                                 />{" "}
                                 Nữ
@@ -182,28 +162,10 @@ const AddTeacher = () => {
                                 <label>Ngày sinh:</label>
                                 <input
                                     type="date"
-                                    placeholder=""
-                                    value={newTeacher.birthday}
-                                    name="birthday"
+                                    value={newTeacher.birthDay}
+                                    name="birthDay"
                                     onChange={handleTeacherInputChange}
                                 />
-                                {errors.birthday && (
-                                    <div className="error">{errors.birthday}</div>
-                                )}
-                            </div>
-                            <div className="formInput email">
-                                <label>Email:</label>
-                                <input
-                                    type="text"
-                                    placeholder="Nhập email"
-                                    value={newTeacher.email}
-                                    name="email"
-                                    onChange={handleTeacherInputChange}
-                                    onFocus={() => handleInputFocus("email")}
-                                />
-                                {errors.email && (
-                                    <div className="error">{errors.email}</div>
-                                )}
                             </div>
 
                             <div className="btn-action">

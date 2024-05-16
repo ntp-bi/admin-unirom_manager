@@ -5,40 +5,40 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { updateAccount, getAccountById } from "../../../components/api/ApiAccount";
-import { getAllTeachers } from "../../../components/api/ApiTeacher";
+import { updateAccount, getAccountById, getAllRole } from "../../../api/ApiAccount";
 
-import "./update-account.scss"
+import "./update-account.scss";
 
 const UpdateAccount = () => {
     const { accountId } = useParams();
 
     const [account, setAccount] = useState({
+        id: "",
         userName: "",
         password: "",
-        id: "",
-        fullName: "",      
-        accountId: ""
+        fullName: "",
+        userId: "",
+        roleId: "",
+        roleName: "",
     });
 
-    const [accountTeachers, setAccountTeachers] = useState([]);
+    const [accountRoles, setAccountRoles] = useState([]);
 
     const [errors, setErrors] = useState({
         userName: "",
         password: "",
-        fullName: "",
     });
 
     useEffect(() => {
-        const fetchAccountTeacher = async () => {
+        const fetchRoleAccount = async () => {
             try {
-                const result = await getAllTeachers();
-                setAccountTeachers(result);
+                const roles = await getAllRole();
+                setAccountRoles(roles);
             } catch (error) {
-                console.error("Error fetching teachers:", error);
+                console.error("Error fetching role:", error);
             }
         };
-        fetchAccountTeacher();
+        fetchRoleAccount();
     }, []);
 
     useEffect(() => {
@@ -56,27 +56,16 @@ const UpdateAccount = () => {
 
     const handleAccountInputChange = (e) => {
         const { name, value } = e.target;
-        setAccount((prevAccount) => ({ ...prevAccount, [name]: value }));
+        setAccount({ ...account, [name]: value });
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+        }));
     };
 
-    const handleAccountTeacherChange = (e) => {
-        const selectedAccountTeacher = e.target.value;
-        const selectedTeacher = accountTeachers.find(
-            (teacher) => teacher.fullName === selectedAccountTeacher
-        );
-
-        if (selectedTeacher) {
-            setAccount({
-                ...account,
-                id: selectedTeacher.accountId,
-                fullName: selectedAccountTeacher,
-            });
-
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                fullName: "", // Xóa thông báo lỗi khi người dùng chọn một loại phòng mới
-            }));
-        }
+    const handleAccountRoleChange = (e) => {
+        const selectedRoleId = e.target.value;
+        setAccount({ ...account, roleId: selectedRoleId });
     };
 
     const handleSubmit = async (e) => {
@@ -99,11 +88,18 @@ const UpdateAccount = () => {
             newErrors.password = "";
         }
 
-        if (!account.id) {
-            newErrors.fullName = "Vui lòng chọn giảng viên.";
+        if (!account.userId) {
+            newErrors.userId = "Vui lòng chọn giảng viên.";
             hasErrors = true;
         } else {
-            newErrors.fullName = "";
+            newErrors.userId = "";
+        }
+
+        if (!account.roleId) {
+            newErrors.roleId = "Vui lòng chọn quyền.";
+            hasErrors = true;
+        } else {
+            newErrors.roleId = "";
         }
 
         if (hasErrors) {
@@ -171,26 +167,26 @@ const UpdateAccount = () => {
                                 )}
                             </div>
 
-                            {/* <div className="formInput">
-                                <label>Tên giảng viên: </label>
+                            <div className="formInput">
+                                <label>Quyền: </label>
                                 <select
                                     className="select"
-                                    name="fullName"
-                                    onChange={handleAccountTeacherChange}
-                                    value={account.fullName}
-                                    onFocus={() => handleInputFocus("fullName")}
+                                    name="roleId"
+                                    onChange={handleAccountRoleChange}
+                                    value={account.roleId}
+                                    onFocus={() => handleInputFocus("roleId")}
                                 >
-                                    <option>-- Chọn giảng viên --</option>
-                                    {accountTeachers.map((teacher) => (
-                                        <option key={teacher.id} value={teacher.fullName}>
-                                            {teacher.fullName}
+                                    <option>-- Chọn quyền --</option>
+                                    {accountRoles.map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                            {role.roleName}
                                         </option>
                                     ))}
                                 </select>
-                                {errors.fullName && (
-                                    <div className="error">{errors.fullName}</div>
+                                {errors.roleId && (
+                                    <div className="error">{errors.roleId}</div>
                                 )}
-                            </div> */}
+                            </div>
 
                             <div className="btn-action">
                                 <Link to="/accounts">

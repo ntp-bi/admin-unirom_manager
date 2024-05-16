@@ -5,27 +5,30 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { updateRoom, getRoomById } from "../../../components/api/ApiRoom";
-import * as typeApi from "../../../components/api/ApiTypeRoom";
+import { updateRoom, getRoomById } from "../../../api/ApiRoom";
+import * as typeApi from "../../../api/ApiTypeRoom";
+
+import { baseIMG } from "../../../api/apiConfig";
 
 const UpdateRoom = () => {
     const { roomId } = useParams();
 
     const [room, setRoom] = useState({
-        img: null,
-        nameRoom: "",
+        image: null,
+        roomName: "",
         area: "",
-        countOfSeat: "",
+        countOfSeats: "",
         description: "",
+        status: 1,
         typeId: "",
-        typeName: "",
     });
 
     const [errors, setErrors] = useState({
+        roomName: "",
         area: "",
-        countOfSeat: "",
+        countOfSeats: "",
+        typeId: "",
     });
-
     const [roomTypes, setRoomTypes] = useState([]);
     const [imagePreview, setImagePreview] = useState("");
 
@@ -46,7 +49,7 @@ const UpdateRoom = () => {
             try {
                 const roomData = await getRoomById(roomId);
                 setRoom(roomData);
-                setImagePreview(roomData.img);
+                setImagePreview(roomData.image);
             } catch (error) {
                 console.error("Lỗi khi lấy thông tin phòng:", error);
             }
@@ -57,37 +60,23 @@ const UpdateRoom = () => {
 
     const handleRoomInputChange = (e) => {
         const { name, value } = e.target;
-        setRoom((prevRoom) => ({ ...prevRoom, [name]: value }));
+        setRoom({ ...room, [name]: value });
     };
 
     const handleRoomTypeChange = (e) => {
-        const selectedRoomType = e.target.value;
-        // tìm phần tử trong mảng roomTypes mà có thuộc tính typeId bằng với giá trị của selectedRoomType
-        const selectedType = roomTypes.find((type) => type.typeName === selectedRoomType);
-
-        if (selectedType) {
-            setRoom({
-                ...room,
-                typeId: selectedType.typeId,
-                typeName: selectedRoomType,
-            });
-
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                roomType: "",
-            }));
-        }
+        const selectedTypeId = e.target.value;
+        setRoom({ ...room, typeid: selectedTypeId });
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        if (selectedImage instanceof File) {
+        const image = e.target.images[0];
+        if (image) {
             const reader = new FileReader();
             reader.onload = () => {
-                setRoom((prevRoom) => ({ ...prevRoom, img: reader.result }));
                 setImagePreview(reader.result);
             };
-            reader.readAsDataURL(selectedImage);
+            reader.readAsDataURL(image);
+            setRoom({ ...room, image: image });
         }
     };
 
@@ -97,18 +86,32 @@ const UpdateRoom = () => {
         let hasErrors = false;
         const newErrors = { ...errors };
 
-        if (room.area <= 0) {
+        if (!room.roomName) {
+            newErrors.roomName = "Vui lòng nhập tên phòng.";
+            hasErrors = true;
+        } else {
+            newErrors.roomName = "";
+        }
+
+        if (!room.area || room.area <= 0) {
             newErrors.area = "Diện tích phòng phải lớn hơn 0.";
             hasErrors = true;
         } else {
             newErrors.area = "";
         }
 
-        if (room.countOfSeat <= 0) {
-            newErrors.countOfSeat = "Số lượng chỗ ngồi phải lớn hơn 0.";
+        if (!room.countOfSeats || room.countOfSeats <= 0) {
+            newErrors.countOfSeats = "Số lượng chỗ ngồi phải lớn hơn 0.";
             hasErrors = true;
         } else {
-            newErrors.countOfSeat = "";
+            newErrors.countOfSeats = "";
+        }
+
+        if (!room.typeId) {
+            newErrors.typeId = "Vui lòng chọn loại phòng.";
+            hasErrors = true;
+        } else {
+            newErrors.typeId = "";
         }
 
         if (hasErrors) {
@@ -117,7 +120,16 @@ const UpdateRoom = () => {
         }
 
         try {
-            const response = await updateRoom(roomId, room);
+            const response = await updateRoom(
+                roomId,
+                room.image,
+                room.roomName,
+                room.area,
+                room.countOfSeats,
+                room.description,
+                room.status,
+                room.typeId
+            );
             if (response.status === 200) {
                 toast.success("Cập nhật phòng thành công!");
             } else {
@@ -148,11 +160,7 @@ const UpdateRoom = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="left">
                                 <img
-                                    src={
-                                        imagePreview
-                                            ? imagePreview
-                                            : "/assets/person/no-image.png"
-                                    }
+                                    src={`${baseIMG}/${room.image}`}
                                     alt="Hình ảnh phòng"
                                     className="image"
                                 />
@@ -160,7 +168,7 @@ const UpdateRoom = () => {
                                 <div className="formInput">
                                     <input
                                         id="img"
-                                        name="img"
+                                        name="image"
                                         type="file"
                                         className="form-control file"
                                         onChange={handleImageChange}
@@ -173,10 +181,14 @@ const UpdateRoom = () => {
                                     <input
                                         type="text"
                                         placeholder="Nhập tên phòng"
-                                        name="nameRoom"
-                                        value={room.nameRoom}
+                                        name="roomName"
+                                        value={room.roomName}
                                         onChange={handleRoomInputChange}
+                                        onFocus={() => handleInputFocus("roomName")}
                                     />
+                                    {errors.roomName && (
+                                        <div className="error">{errors.roomName}</div>
+                                    )}
                                 </div>
 
                                 <div className="formInput">
@@ -184,19 +196,20 @@ const UpdateRoom = () => {
                                     <select
                                         className="select"
                                         onChange={handleRoomTypeChange}
-                                        name="typeName"
-                                        value={room.typeName}
+                                        name="typeId"
+                                        value={room.typeId}
+                                        onFocus={() => handleInputFocus("typeId")}
                                     >
                                         <option>-- Chọn loại phòng --</option>
                                         {roomTypes.map((type) => (
-                                            <option
-                                                key={type.typeId}
-                                                value={type.typeName}
-                                            >
+                                            <option key={type.id} value={type.id}>
                                                 {type.typeName}
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.typeId && (
+                                        <div className="error">{errors.typeId}</div>
+                                    )}
                                 </div>
                                 <div className="formInput">
                                     <label>Diện tích:</label>
@@ -217,13 +230,13 @@ const UpdateRoom = () => {
                                     <input
                                         type="number"
                                         placeholder="Nhập số lượng chỗ ngồi"
-                                        name="countOfSeat"
-                                        value={room.countOfSeat}
+                                        name="countOfSeats"
+                                        value={room.countOfSeats}
                                         onChange={handleRoomInputChange}
-                                        onFocus={() => handleInputFocus("countOfSeat")}
+                                        onFocus={() => handleInputFocus("countOfSeats")}
                                     />
-                                    {errors.countOfSeat && (
-                                        <div className="error">{errors.countOfSeat}</div>
+                                    {errors.countOfSeats && (
+                                        <div className="error">{errors.countOfSeats}</div>
                                     )}
                                 </div>
                                 <div className="formArea">

@@ -5,24 +5,22 @@ import { toast } from "react-toastify";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
-import { getTeacherById, updateTeacher } from "../../../components/api/ApiTeacher";
+import { getTeacherById, updateTeacher } from "../../../api/ApiTeacher";
 
 const UpdateTeacher = () => {
     const { teacherId } = useParams();
 
     const [teacher, setTeacher] = useState({
         fullName: "",
-        birthday: "",
-        img: null,
-        gentle: "",
-        email: "",
+        birthDay: "",
+        gender: true,
+        file: null,
     });
 
     const [imagePreview, setImagePreview] = useState("");
 
     const [errors, setErrors] = useState({
         fullName: "",
-        email: "",
     });
 
     useEffect(() => {
@@ -30,7 +28,7 @@ const UpdateTeacher = () => {
             try {
                 const teacherData = await getTeacherById(teacherId);
                 setTeacher(teacherData);
-                setImagePreview(teacherData.img);
+                setImagePreview(teacherData.file);
             } catch (error) {
                 console.error("Error fetching teacher:", error);
             }
@@ -41,69 +39,68 @@ const UpdateTeacher = () => {
 
     const handleTeacherInputChange = (e) => {
         const { name, value } = e.target;
-        setTeacher({ ...teacher, [name]: value });
-
+        const newValue = name === "gender" ? e.target.value === "true" : value;
+        setTeacher({ ...teacher, [name]: newValue });
         setErrors((prevErrors) => ({
             ...prevErrors,
+            [name]: "",
         }));
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        // Kiểm tra xem selectedImage có tồn tại không và có phải là đối tượng File không
-        if (selectedImage instanceof File) {
-            // Tạo một đối tượng FileReader để đọc dữ liệu của tệp hình ảnh
+        const file = e.target.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                // Khi FileReader đọc xong, gán dữ liệu hình ảnh vào thuộc tính img của newRoom
-                setTeacher((prevTeacher) => ({ ...prevTeacher, img: reader.result }));
-                // Hiển thị xem trước hình ảnh
                 setImagePreview(reader.result);
             };
-            // Bắt đầu đọc dữ liệu của tệp hình ảnh
-            reader.readAsDataURL(selectedImage);
+            reader.readAsDataURL(file);
+            setTeacher({ ...teacher, file: file });
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         let hasErrors = false;
         const newErrors = { ...errors };
-
+    
         if (!teacher.fullName) {
             newErrors.fullName = "Vui lòng nhập họ tên.";
             hasErrors = true;
         } else {
             newErrors.fullName = "";
         }
-
-        const emailRegex = /^\S+@\S+\.\S+$/;
-        if (!teacher.email) {
-            newErrors.email = "Vui lòng nhập email.";
-            hasErrors = true;
-        } else if (!emailRegex.test(teacher.email)) {
-            newErrors.email = "Email không hợp lệ.";
+    
+        // Check if gender is not selected
+        if (teacher.gender === "") {
+            newErrors.gender = "Vui lòng chọn giới tính.";
             hasErrors = true;
         } else {
-            newErrors.email = "";
+            newErrors.gender = "";
         }
-
-        // Set error state và ngừng submit nếu có lỗi
+    
         if (hasErrors) {
             setErrors(newErrors);
             return;
         }
-
+    
         try {
-            const response = await updateTeacher(teacherId, teacher);
+            const response = await updateTeacher(
+                teacherId,
+                teacher
+            );
             if (response.status === 200) {
                 toast.success("Cập nhật thông tin giáo viên thành công!");
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật thông tin giáo viên!");
             }
         } catch (error) {
-            toast.error(error.message);
+            if (error.response) {                
+                toast.error(error.response.data.message);
+            } else {               
+                toast.error("Có lỗi xảy ra khi kết nối đến máy chủ.");
+            }
         }
     };
 
@@ -113,7 +110,6 @@ const UpdateTeacher = () => {
             [fieldName]: "",
         }));
     };
-
 
     return (
         <div className="addTeacher">
@@ -138,7 +134,7 @@ const UpdateTeacher = () => {
                             <div className="formInput input-image">
                                 <input
                                     id="img"
-                                    name="img"
+                                    name="file"
                                     type="file"
                                     className="form-control file"
                                     onChange={handleImageChange}
@@ -167,18 +163,18 @@ const UpdateTeacher = () => {
                                 <input
                                     className="input-radio"
                                     type="radio"
-                                    value="Nam"
-                                    name="gentle"
-                                    checked={teacher.gentle === "Nam"}
+                                    value={true}
+                                    name="gender"
+                                    checked={teacher.gender === true}
                                     onChange={handleTeacherInputChange}
                                 />{" "}
                                 Nam
                                 <input
                                     className="input-radio"
                                     type="radio"
-                                    value="Nữ"
-                                    name="gentle"
-                                    checked={teacher.gentle === "Nữ"}
+                                    value={false}
+                                    name="gender"
+                                    checked={teacher.gender === false}
                                     onChange={handleTeacherInputChange}
                                 />{" "}
                                 Nữ
@@ -189,24 +185,11 @@ const UpdateTeacher = () => {
                                 <input
                                     type="date"
                                     placeholder=""
-                                    value={teacher.birthday}
-                                    name="birthday"
+                                    value={teacher.birthDay}
+                                    name="birthDay"
                                     onChange={handleTeacherInputChange}
                                 />
-                            </div>
-                            <div className="formInput email">
-                                <label>Email:</label>
-                                <input
-                                    type="text"
-                                    placeholder="Nhập email"
-                                    value={teacher.email}
-                                    name="email"
-                                    onChange={handleTeacherInputChange}
-                                    onFocus={() => handleInputFocus("email")}
-                                />
-                                {errors.email && (
-                                    <div className="error">{errors.email}</div>
-                                )}
+                                {console.log(teacher.birthDay)}
                             </div>
 
                             <div className="btn-action">
