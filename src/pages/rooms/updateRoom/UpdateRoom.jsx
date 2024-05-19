@@ -10,6 +10,8 @@ import * as typeApi from "../../../api/ApiTypeRoom";
 
 import { baseIMG } from "../../../api/apiConfig";
 
+import "./update-room.scss";
+
 const UpdateRoom = () => {
     const { roomId } = useParams();
 
@@ -19,7 +21,7 @@ const UpdateRoom = () => {
         area: "",
         countOfSeats: "",
         description: "",
-        status: 1,
+        status: 2,
         typeId: "",
     });
 
@@ -66,6 +68,11 @@ const UpdateRoom = () => {
     const handleRoomTypeChange = (e) => {
         const selectedTypeId = e.target.value;
         setRoom({ ...room, typeid: selectedTypeId });
+    };
+
+    const handleStatusChange = (e) => {
+        const selectedStatus = parseInt(e.target.value, 10);
+        setRoom({ ...room, status: selectedStatus });
     };
 
     const handleImageChange = (e) => {
@@ -148,9 +155,9 @@ const UpdateRoom = () => {
     };
 
     return (
-        <div className="add">
+        <div className="update">
             <Sidebar />
-            <div className="addContainer">
+            <div className="updateContainer">
                 <Navbar />
                 <div className="main">
                     <div className="top">
@@ -191,7 +198,61 @@ const UpdateRoom = () => {
                                     )}
                                 </div>
 
+                                <div className="formInput radio">
+                                    <label>Trạng thái:</label>
+                                    <div className="form-radio">
+                                        <input
+                                            className="input-radio"
+                                            type="radio"
+                                            value="1"
+                                            name="status"
+                                            checked={room.status === 1}
+                                            onChange={handleStatusChange}
+                                        />{" "}
+                                        Bị hỏng | bảo trì
+                                        <input
+                                            className="input-radio"
+                                            type="radio"
+                                            value="2"
+                                            name="status"
+                                            checked={room.status === 2}
+                                            onChange={handleStatusChange}
+                                        />{" "}
+                                        Sử dụng được
+                                    </div>
+                                </div>
+
                                 <div className="formInput">
+                                    <label>Số lượng chỗ ngồi:</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Nhập số lượng chỗ ngồi"
+                                        name="countOfSeats"
+                                        value={room.countOfSeats}
+                                        onChange={handleRoomInputChange}
+                                        onFocus={() => handleInputFocus("countOfSeats")}
+                                    />
+                                    {errors.countOfSeats && (
+                                        <div className="error">{errors.countOfSeats}</div>
+                                    )}
+                                </div>
+
+                                <div className="formInput">
+                                    <label>Diện tích:</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Nhập diện tích"
+                                        name="area"
+                                        value={room.area}
+                                        onChange={handleRoomInputChange}
+                                        onFocus={() => handleInputFocus("area")}
+                                    />
+                                    {errors.area && (
+                                        <div className="error">{errors.area}</div>
+                                    )}
+                                </div>
+
+                                <div className="formInput input-type">
                                     <label>Loại phòng: </label>
                                     <select
                                         className="select"
@@ -209,34 +270,6 @@ const UpdateRoom = () => {
                                     </select>
                                     {errors.typeId && (
                                         <div className="error">{errors.typeId}</div>
-                                    )}
-                                </div>
-                                <div className="formInput">
-                                    <label>Diện tích:</label>
-                                    <input
-                                        type="number"
-                                        placeholder="Nhập diện tích"
-                                        name="area"
-                                        value={room.area}
-                                        onChange={handleRoomInputChange}
-                                        onFocus={() => handleInputFocus("area")}
-                                    />
-                                    {errors.area && (
-                                        <div className="error">{errors.area}</div>
-                                    )}
-                                </div>
-                                <div className="formInput">
-                                    <label>Số lượng chỗ ngồi:</label>
-                                    <input
-                                        type="number"
-                                        placeholder="Nhập số lượng chỗ ngồi"
-                                        name="countOfSeats"
-                                        value={room.countOfSeats}
-                                        onChange={handleRoomInputChange}
-                                        onFocus={() => handleInputFocus("countOfSeats")}
-                                    />
-                                    {errors.countOfSeats && (
-                                        <div className="error">{errors.countOfSeats}</div>
                                     )}
                                 </div>
                                 <div className="formArea">

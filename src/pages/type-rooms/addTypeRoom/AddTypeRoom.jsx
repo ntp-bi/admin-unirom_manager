@@ -50,7 +50,7 @@ const AddTypeRoom = () => {
             toast.success("Loại phòng đã được thêm thành công!");
             setNewType({ typeName: "" });
         } catch (error) {
-            toast.error("Có lỗi xảy ra khi thêm loại phòng!");
+            toast.error("Loại phòng đã tồn tại!");
             console.error("Error adding Type:", error);
         }
     };

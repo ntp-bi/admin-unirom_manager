@@ -45,19 +45,16 @@ const Room = () => {
     const statuses = [...new Set(rooms.map((room) => room.status))];
 
     const STATUS_LABELS = {
-        1: "Còn trống",
-        2: "Đã được đặt",
-        3: "Bị hỏng",
+        1: "Bị hỏng hoặc bảo trì",
+        2: "Có thể sử dụng",        
     };
 
     const getStatusClassName = (status) => {
         switch (parseInt(status)) {
             case 1:
-                return "Available";
-            case 2:
-                return "Booked";
-            case 3:
                 return "Broken";
+            case 2:
+                return "Available";           
             default:
                 return "";
         }

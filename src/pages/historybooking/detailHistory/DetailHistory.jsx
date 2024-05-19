@@ -8,6 +8,8 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
 
 import * as api from "../../../api/ApiHistories";
+import { baseIMG } from "../../../api/apiConfig";
+
 import "./detail-history.scss";
 
 const DetailHistory = () => {
@@ -135,10 +137,7 @@ const DetailHistory = () => {
                         </div>
                         <form>
                             <div className="left">
-                                <img
-                                    src={histories.photo || "/assets/person/no-image.png"}
-                                    alt=""
-                                />
+                                <img src={`${baseIMG}/${histories.photo}`} alt="" />
                             </div>
                             <div className="right">
                                 <div className="formInput">

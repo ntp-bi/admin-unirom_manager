@@ -125,15 +125,14 @@ const Teacher = () => {
         if (confirmed) {
             try {
                 const result = await api.deleteTeacher(teacherId); 
-                if (result) {
-                    // Nếu kết quả trả về không rỗng (xóa phòng thành công)
-                    toast.success(`Giáo viên ${teacherId} đã được xóa thành công!`);
+                if (result) {                    
+                    toast.success(`Giáo viên đã được xóa thành công!`);
                     fetchTeachers();
                 } else {                    
                     toast.error(`Có lỗi khi xóa giáo viên.`);
                 }
             } catch (error) {
-                toast.error(`Có lỗi: ${error.message}`);
+                toast.error(`Không thể xóa giáo viên này!.`);
             }
         }
         setTimeout(() => {
@@ -222,7 +221,7 @@ const Teacher = () => {
 
                                             <div className="item">
                                                 <img
-                                                    src={`${baseIMG}/${teacher.img}`}
+                                                    src={`${baseIMG}/${teacher.photo}`}
                                                     alt=""
                                                     className="itemImg"
                                                 />

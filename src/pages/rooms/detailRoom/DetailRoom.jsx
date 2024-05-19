@@ -17,6 +17,11 @@ const DetailRoom = () => {
     const [room, setRoom] = useState([]);
     const [roomTypes, setRoomTypes] = useState([]);
 
+    const STATUS_LABELS = {
+        1: "Bị hỏng hoặc bảo trì",
+        2: "Có thể sử dụng",
+    };
+
     useEffect(() => {
         const fetchRoomTypes = async () => {
             try {
@@ -78,6 +83,14 @@ const DetailRoom = () => {
                                             Loại phòng:
                                             <span className="info type-room">
                                                 {room.typeName}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="formInput">
+                                        <label>
+                                            Trạng thái:
+                                            <span className="info type-room">
+                                                {STATUS_LABELS[room.status]}
                                             </span>
                                         </label>
                                     </div>

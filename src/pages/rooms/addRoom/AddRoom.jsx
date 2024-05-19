@@ -17,7 +17,7 @@ const AddRoom = () => {
         area: "",
         countofseats: "",
         description: "",
-        status: 1,
+        status: 2,
         typeid: "",
     });
 
@@ -120,7 +120,7 @@ const AddRoom = () => {
                 area: "",
                 countofseats: "",
                 description: "",
-                status: 1,
+                status: 2,
                 typeid: "",
             });
             setImagePreview("");

@@ -15,21 +15,6 @@ export const getAllList = async () => {
     }
 };
 
-export const deleteList = async (detailId) => {
-    try {
-        const token = localStorage.getItem("token");
-
-        const response = await api.delete(`/lists/${detailId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data.data;
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
 export const confirmReservation = async (detailId) => {
     try {
         const token = localStorage.getItem("token");
@@ -54,7 +39,7 @@ export const rejectReservation = async (detailId) => {
     try {
         const token = localStorage.getItem("token");
 
-        const response = await api.put(`/detail/both/cancelbookingroom/${detailId}`, null, {
+        const response = await api.put(`detail/admin/refusebookingroom/${detailId}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

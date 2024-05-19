@@ -105,12 +105,12 @@ const UpdateEvent = () => {
                             </div>
 
                             <div className="btn-action">
-                                <Link to="/events">
-                                    <button className="back">Trở về</button>
-                                </Link>
                                 <button className="btn-add" type="submit">
                                     Cập nhật
                                 </button>
+                                <Link to="/events">
+                                    <button className="back">Trở về</button>
+                                </Link>
                             </div>
                         </form>
                     </div>

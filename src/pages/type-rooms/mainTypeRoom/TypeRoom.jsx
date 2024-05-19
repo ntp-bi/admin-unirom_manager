@@ -124,7 +124,7 @@ const TypeRoom = () => {
                 const result = await api.deleteType(typeId); // Gọi API xóa loại phòng
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa loại phòng thành công)
-                    toast.success(`Xóa phòng ${typeId} đã được xóa thành công!`);
+                    toast.success(`Loại phòng đã được xóa thành công!`);
                     fetchTypeRooms();
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)

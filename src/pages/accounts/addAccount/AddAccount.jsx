@@ -76,9 +76,13 @@ const AddEvent = () => {
 
         let hasErrors = false;
         const newErrors = { ...errors };
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!newAccount.userName) {
             newErrors.userName = "Vui lòng nhập tên tài khoản.";
+            hasErrors = true;
+        } else if (!emailRegex.test(newAccount.userName)) {
+            newErrors.userName = "Tên tài khoản phải là email hợp lệ.";
             hasErrors = true;
         } else {
             newErrors.userName = "";
@@ -135,7 +139,7 @@ const AddEvent = () => {
                 roleName: "",
             });
         } catch (error) {
-            toast.error("Có lỗi xảy ra khi thêm tài khoản!");
+            toast.error("Tài khoản đã tồn tại!");
             console.error("Error adding account:", error);
         }
     };
@@ -229,12 +233,12 @@ const AddEvent = () => {
                             </div>
 
                             <div className="btn-action">
-                                <Link to="/accounts">
-                                    <button className="back">Trở về</button>
-                                </Link>
                                 <button className="btn-add" type="submit">
                                     Thêm
                                 </button>
+                                <Link to="/accounts">
+                                    <button className="back">Trở về</button>
+                                </Link>
                             </div>
                         </form>
                     </div>

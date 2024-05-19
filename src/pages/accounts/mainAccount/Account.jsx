@@ -124,7 +124,7 @@ const Account = () => {
                 const result = await api.deleteAccount(accountId); // Gọi API xóa sự kiện
                 if (result) {
                     // Nếu kết quả trả về không rỗng (xóa sự kiện thành công)
-                    toast.success(`Tài khoản ${accountId} đã được xóa thành công!`);
+                    toast.success(`Tài khoản đã được xóa thành công!`);
                     fetchRooms();
                 } else {
                     // Nếu kết quả trả về rỗng (có lỗi xảy ra)

@@ -7,6 +7,9 @@ import Navbar from "../../../components/navbar/Navbar";
 
 import { getTeacherById, updateTeacher } from "../../../api/ApiTeacher";
 
+import moment from "moment";
+import { baseIMG } from "../../../api/apiConfig";
+
 const UpdateTeacher = () => {
     const { teacherId } = useParams();
 
@@ -27,6 +30,10 @@ const UpdateTeacher = () => {
         const fetchTeacher = async () => {
             try {
                 const teacherData = await getTeacherById(teacherId);
+                // Convert birthDay format from dd/MM/yyyy to yyyy-MM-dd
+                teacherData.birthDay = moment(teacherData.birthDay, "YYYY/MM/DD").format(
+                    "YYYY-MM-DD"
+                );
                 setTeacher(teacherData);
                 setImagePreview(teacherData.file);
             } catch (error) {
@@ -61,17 +68,17 @@ const UpdateTeacher = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         let hasErrors = false;
         const newErrors = { ...errors };
-    
+
         if (!teacher.fullName) {
             newErrors.fullName = "Vui lòng nhập họ tên.";
             hasErrors = true;
         } else {
             newErrors.fullName = "";
         }
-    
+
         // Check if gender is not selected
         if (teacher.gender === "") {
             newErrors.gender = "Vui lòng chọn giới tính.";
@@ -79,26 +86,23 @@ const UpdateTeacher = () => {
         } else {
             newErrors.gender = "";
         }
-    
+
         if (hasErrors) {
             setErrors(newErrors);
             return;
         }
-    
+
         try {
-            const response = await updateTeacher(
-                teacherId,
-                teacher
-            );
-            if (response.status === 200) {
+            const response = await updateTeacher(teacherId, teacher);
+            if (response.status === 200 || response.status === 201) {
                 toast.success("Cập nhật thông tin giáo viên thành công!");
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật thông tin giáo viên!");
             }
         } catch (error) {
-            if (error.response) {                
+            if (error.response) {
                 toast.error(error.response.data.message);
-            } else {               
+            } else {
                 toast.error("Có lỗi xảy ra khi kết nối đến máy chủ.");
             }
         }
@@ -123,11 +127,7 @@ const UpdateTeacher = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="left">
                             <img
-                                src={
-                                    imagePreview
-                                        ? imagePreview
-                                        : "/assets/person/no-image.png"
-                                }
+                                src={`${baseIMG}/${teacher.file}`}
                                 alt=""
                                 className="image"
                             />
@@ -160,24 +160,26 @@ const UpdateTeacher = () => {
 
                             <div className="formInput radio">
                                 <label>Giới tính:</label>
-                                <input
-                                    className="input-radio"
-                                    type="radio"
-                                    value={true}
-                                    name="gender"
-                                    checked={teacher.gender === true}
-                                    onChange={handleTeacherInputChange}
-                                />{" "}
-                                Nam
-                                <input
-                                    className="input-radio"
-                                    type="radio"
-                                    value={false}
-                                    name="gender"
-                                    checked={teacher.gender === false}
-                                    onChange={handleTeacherInputChange}
-                                />{" "}
-                                Nữ
+                                <div className="form-radio">
+                                    <input
+                                        className="input-radio"
+                                        type="radio"
+                                        value={true}
+                                        name="gender"
+                                        checked={teacher.gender === true}
+                                        onChange={handleTeacherInputChange}
+                                    />{" "}
+                                    Nam
+                                    <input
+                                        className="input-radio"
+                                        type="radio"
+                                        value={false}
+                                        name="gender"
+                                        checked={teacher.gender === false}
+                                        onChange={handleTeacherInputChange}
+                                    />{" "}
+                                    Nữ
+                                </div>
                             </div>
 
                             <div className="formInput">
@@ -189,7 +191,6 @@ const UpdateTeacher = () => {
                                     name="birthDay"
                                     onChange={handleTeacherInputChange}
                                 />
-                                {console.log(teacher.birthDay)}
                             </div>
 
                             <div className="btn-action">

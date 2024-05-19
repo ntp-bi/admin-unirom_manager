@@ -136,28 +136,6 @@ const AddTeacher = () => {
                                 )}
                             </div>
 
-                            <div className="formInput radio">
-                                <label>Giới tính:</label>
-                                <input
-                                    className="input-radio"
-                                    type="radio"
-                                    value={true}
-                                    name="gender"
-                                    checked={newTeacher.gender === true}
-                                    onChange={handleTeacherInputChange}
-                                />{" "}
-                                Nam
-                                <input
-                                    className="input-radio"
-                                    type="radio"
-                                    value={false}
-                                    name="gender"
-                                    checked={newTeacher.gender === false}
-                                    onChange={handleTeacherInputChange}
-                                />{" "}
-                                Nữ
-                            </div>
-
                             <div className="formInput">
                                 <label>Ngày sinh:</label>
                                 <input
@@ -166,6 +144,30 @@ const AddTeacher = () => {
                                     name="birthDay"
                                     onChange={handleTeacherInputChange}
                                 />
+                            </div>
+
+                            <div className="formInput radio">
+                                <label>Giới tính:</label>
+                                <div className="form-radio">
+                                    <input
+                                        className="input-radio"
+                                        type="radio"
+                                        value={true}
+                                        name="gender"
+                                        checked={newTeacher.gender === true}
+                                        onChange={handleTeacherInputChange}
+                                    />{" "}
+                                    Nam
+                                    <input
+                                        className="input-radio"
+                                        type="radio"
+                                        value={false}
+                                        name="gender"
+                                        checked={newTeacher.gender === false}
+                                        onChange={handleTeacherInputChange}
+                                    />{" "}
+                                    Nữ
+                                </div>
                             </div>
 
                             <div className="btn-action">
